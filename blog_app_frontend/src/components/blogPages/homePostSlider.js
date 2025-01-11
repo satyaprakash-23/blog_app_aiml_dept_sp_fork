@@ -41,7 +41,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative w-full overflow-hidden rounded-md h-full ">
+    <div className="relative w-full overflow-hidden rounded-md min-h-[80vh] ">
       {/* Image Slider */}
       <div className="absolute inset-0 ">
         <img
@@ -54,7 +54,7 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex items-center">
+      <div className="relative h-full flex items-center p-5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <span className="inline-block px-4 py-1 mb-4 text-sm font-semibold text-blue-100 bg-blue-600/80 rounded-full">

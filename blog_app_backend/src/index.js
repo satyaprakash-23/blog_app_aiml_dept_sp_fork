@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import connectDB from "./db/dbConnectionLogic.js";
 import app from "./app.js";
-import { insertStudents } from "./models/students.model.js";
+// import { insertStudents } from "./models/student.model.js";
 
 dotenv.config({
     path: "./env"
@@ -18,7 +18,9 @@ connectDB()
   });
 
   app.listen(port, () => {
-    console.log(`App/Server is listening on port: ${port}`);
+    console.log(
+      `App/Server is listening on port: http://localhost:${port}`
+    );
   });
 
   // insertStudents(); -> Do not uncomment this.

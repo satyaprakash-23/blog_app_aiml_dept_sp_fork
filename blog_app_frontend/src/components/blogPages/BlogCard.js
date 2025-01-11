@@ -5,8 +5,7 @@ const BlogCard = ({ post, onClick }) => {
   return (
     
     <div 
-      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-      onClick={() => onClick(post.id)}
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-150 cursor-default"
     >
       <img 
         src={post.coverImage} 
@@ -33,7 +32,7 @@ const BlogCard = ({ post, onClick }) => {
         </div>
         <p className="text-gray-600 mb-4 line-clamp-3">{post.summary}</p>
         <button 
-          className="text-blue-600 hover:text-blue-800 font-medium"
+          className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
             onClick(post.id);

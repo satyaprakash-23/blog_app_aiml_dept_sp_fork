@@ -2,11 +2,15 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Heart, MessageCircle, Settings } from 'lucide-react';
 import { blogPosts } from './blogData'; // Adjust the import path if necessary
+import { useSelector } from 'react-redux';
 
 const BlogDetail = () => {
   const navigate = useNavigate();  // Initialize useNavigate hook
   const { id } = useParams();  // Extract 'id' parameter from the URL
   const post = blogPosts.find(post => post.id === id);  // Find the post with that 'id'
+
+  const userData = useSelector((state) => state.auth.userData);
+  const isAdmin = userData?.isAdmin;
 
   if (!post) {
     return <p>Post not found!</p>;  // Handle case where post is not found
@@ -16,13 +20,21 @@ const BlogDetail = () => {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <button 
-          onClick={() => navigate(-1)}  // Use navigate(-1) to go back to the previous page
+        <button
+          onClick={() => navigate(-1)} // Use navigate(-1) to go back to the previous page
           className="text-gray-600 hover:text-gray-900"
         >
           ← Back
         </button>
-        <button className="text-gray-600 hover:text-gray-900">
+        <button
+          className={`text-gray-600  ${
+            isAdmin
+              ? "cursor-pointer hover:text-gray-900"
+              : "cursor-not-allowed"
+          } `}
+          onClick={()=>console.log("clicked")}
+          disabled = {isAdmin ? false : true}
+        >
           <Settings className="w-6 h-6" />
         </button>
       </div>
@@ -32,8 +44,8 @@ const BlogDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Cover Image */}
         <div className="lg:col-span-3">
-          <img 
-            src={post.coverImage} 
+          <img
+            src={post.coverImage}
             alt={post.title}
             className="w-full rounded-lg shadow-lg"
           />
@@ -81,7 +93,9 @@ const BlogDetail = () => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-600">No comments yet. Be the first to comment!</p>
+          <p className="text-gray-600">
+            No comments yet. Be the first to comment!
+          </p>
         )}
       </div>
     </div>
