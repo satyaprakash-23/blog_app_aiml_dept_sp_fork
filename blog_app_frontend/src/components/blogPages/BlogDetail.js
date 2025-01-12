@@ -9,9 +9,12 @@ const BlogDetail = () => {
   const { id } = useParams();
   const post = blogPosts.find((post) => post.id === id);
 
-  const userData = useSelector((state) => state.auth.userData);
+  // const userData = useSelector((state) => state.auth.userData);
+  const { isLoggedIn, userData } = useSelector((state) => state.auth);
   const isAdmin = userData?.isAdmin;
-  const isLoggedIn = userData?.isLoggedIn;
+  // const isLoggedIn = userData?.isLoggedIn;
+  console.log("now" + isLoggedIn);
+  
 
   if (!post) {
     return <p>Post not found!</p>;
@@ -27,14 +30,14 @@ const BlogDetail = () => {
         >
           ← Back
         </button>
-        <Tooltip message="Admin only" show={!isAdmin}>
+        <Tooltip message="Admin only" show={!userData?.isAdmin}>
           <button
             className={`text-gray-600 ${
               isAdmin
                 ? "cursor-pointer hover:text-gray-900"
                 : "cursor-not-allowed"
             }`}
-            disabled={!isAdmin}
+            disabled={!userData?.isAdmin}
           >
             <Settings className="w-6 h-6" />
           </button>
