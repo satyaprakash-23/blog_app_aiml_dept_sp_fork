@@ -1,6 +1,6 @@
-import express from "express"
-import cors from "cors"
-import cookieParser from "cookie-parser"
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -31,11 +31,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // For data from URL forms/body, when we accept data, we do some restrictions!
-app.use(express.json({limit: "16kb"}));
+app.use(express.json({ limit: "16kb" }));
 
 // 13:39 L9) Some more settings.
 // For data from URL:
-app.use(express.urlencoded({extended: true, limit: "16kb"}));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 // For maybe a public folder or public assets
 app.use(express.static("public"));
@@ -52,5 +52,4 @@ import postRoutes from "./routes/post.routes.js"
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/post", postRoutes);
 
-export default app
-
+export default app;
