@@ -9,7 +9,7 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  poster: {
+  posterUrl: {
     type: String,
     required: true,
   },

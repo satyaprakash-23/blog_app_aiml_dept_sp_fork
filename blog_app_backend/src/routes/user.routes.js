@@ -12,4 +12,5 @@ router.route("/signin").post(signin);
 router.route("/signout").post(verifyJWTandPopulateUserDataInReq, signout);
 router.route("/checkSession").get(verifyJWTandPopulateUserDataInReq, sessionCheck);
 
-export {router};
+// export {router};
+export default router;
