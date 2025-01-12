@@ -1,19 +1,20 @@
-import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Heart, MessageCircle, Settings } from 'lucide-react';
-import { blogPosts } from './blogData'; // Adjust the import path if necessary
-import { useSelector } from 'react-redux';
-
+import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Heart, MessageCircle, Settings } from "lucide-react";
+import { blogPosts } from "./blogData";
+import { useSelector } from "react-redux";
+import Tooltip from "./Tooltip"; 
 const BlogDetail = () => {
-  const navigate = useNavigate();  // Initialize useNavigate hook
-  const { id } = useParams();  // Extract 'id' parameter from the URL
-  const post = blogPosts.find(post => post.id === id);  // Find the post with that 'id'
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const post = blogPosts.find((post) => post.id === id);
 
   const userData = useSelector((state) => state.auth.userData);
   const isAdmin = userData?.isAdmin;
+  const isLoggedIn = userData?.isLoggedIn;
 
   if (!post) {
-    return <p>Post not found!</p>;  // Handle case where post is not found
+    return <p>Post not found!</p>;
   }
 
   return (
@@ -21,22 +22,23 @@ const BlogDetail = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <button
-          onClick={() => navigate(-1)} // Use navigate(-1) to go back to the previous page
+          onClick={() => navigate(-1)}
           className="text-gray-600 hover:text-gray-900"
         >
           ← Back
         </button>
-        <button
-          className={`text-gray-600  ${
-            isAdmin
-              ? "cursor-pointer hover:text-gray-900"
-              : "cursor-not-allowed"
-          } `}
-          onClick={()=>console.log("clicked")}
-          disabled = {isAdmin ? false : true}
-        >
-          <Settings className="w-6 h-6" />
-        </button>
+        <Tooltip message="Admin only" show={!isAdmin}>
+          <button
+            className={`text-gray-600 ${
+              isAdmin
+                ? "cursor-pointer hover:text-gray-900"
+                : "cursor-not-allowed"
+            }`}
+            disabled={!isAdmin}
+          >
+            <Settings className="w-6 h-6" />
+          </button>
+        </Tooltip>
       </div>
 
       <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
@@ -51,14 +53,30 @@ const BlogDetail = () => {
           />
           {/* Interaction Buttons */}
           <div className="flex items-center space-x-4 mt-4">
-            <button className="flex items-center space-x-2 text-rose-500">
-              <Heart className="w-6 h-6" />
-              <span>{post.appreciationCount}</span>
-            </button>
-            <button className="flex items-center space-x-2 text-gray-600">
-              <MessageCircle className="w-6 h-6" />
-              <span>{post.comments.length}</span>
-            </button>
+            <Tooltip message="Login first" show={!isLoggedIn}>
+              <button
+                className={`flex items-center space-x-2 text-rose-500 ${
+                  isLoggedIn
+                    ? "cursor-pointer hover:text-rose-700"
+                    : "cursor-not-allowed text-rose-300"
+                }`}
+              >
+                <Heart className="w-6 h-6" />
+                <span>{post.appreciationCount}</span>
+              </button>
+            </Tooltip>
+            <Tooltip message="Login first" show={!isLoggedIn}>
+              <button
+                className={`flex items-center space-x-2 text-gray-500 ${
+                  isLoggedIn
+                    ? "cursor-pointer hover:text-gray-700"
+                    : "cursor-not-allowed text-gray-300"
+                }`}
+              >
+                <MessageCircle className="w-6 h-6" />
+                <span>{post.comments.length}</span>
+              </button>
+            </Tooltip>
           </div>
         </div>
 
