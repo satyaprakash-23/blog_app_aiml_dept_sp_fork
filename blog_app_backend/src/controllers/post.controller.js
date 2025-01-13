@@ -176,7 +176,7 @@ const getPost = async(req, res) => {
       })
       .populate({
         path: "author", // Populate the author field
-        select: "name email", // Include only the name and email fields
+        select: "name email avatarUrl", // Include only the name and email fields
       });
 
     // Check if post exists
@@ -204,7 +204,7 @@ const getUserPosts = async (req, res) => {
     // Find posts where the author matches the logged-in user's ID
     const posts = await Post.find({ author: userId })
       .populate("content", "postContent") // Populate the 'content' field to include postContent
-      .populate("author", "name email") // Optionally populate author's name and email
+      .populate("author", "name email avatarUrl") // Optionally populate author's name and email
       .exec();
 
     // Respond with the posts
@@ -225,7 +225,7 @@ const getAllPosts = async (req, res) => {
   try {
     // Fetch all posts from the database
     const posts = await Post.find()
-    .populate("author", "name email") // Optionally populate author's name and email
+    .populate("author", "name email avatarUrl") // Optionally populate author's name and email
     .exec();
     
     // .populate("content", "postContent") // Populate the 'content' field to include postContent -> content not needed as of now.
