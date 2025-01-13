@@ -3,11 +3,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Heart, MessageCircle, Settings } from "lucide-react";
 import { blogPosts } from "./blogData";
 import { useSelector } from "react-redux";
-import Tooltip from "./Tooltip"; 
+import Tooltip from "./Tooltip";
+import useAllPostData from "../utils/useAllPostData";
+import usePostDetail from "../utils/usePostDetail";
+
 const BlogDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const post = blogPosts.find((post) => post.id === id);
+  const postDetail = usePostDetail(id);
+  const post = postDetail?.queriedPost;
+  // const post = postDetail?.find((post) => post._id === id);
+  console.log(post);
+  
 
   // const userData = useSelector((state) => state.auth.userData);
   const { isLoggedIn, userData } = useSelector((state) => state.auth);
@@ -50,7 +57,7 @@ const BlogDetail = () => {
         {/* Cover Image */}
         <div className="lg:col-span-3">
           <img
-            src={post.coverImage}
+            src={post.posterUrl}
             alt={post.title}
             className="w-full rounded-lg shadow-lg"
           />
@@ -65,7 +72,7 @@ const BlogDetail = () => {
                 }`}
               >
                 <Heart className="w-6 h-6" />
-                <span>{post.appreciationCount}</span>
+                <span>{post?.appreciationCount}</span>
               </button>
             </Tooltip>
             <Tooltip message="Login first" show={!isLoggedIn}>
@@ -77,7 +84,7 @@ const BlogDetail = () => {
                 }`}
               >
                 <MessageCircle className="w-6 h-6" />
-                <span>{post.comments.length}</span>
+                <span>{post?.comments?.length}</span>
               </button>
             </Tooltip>
           </div>
@@ -92,13 +99,13 @@ const BlogDetail = () => {
 
           <div className="bg-gray-50 p-6 rounded-lg mb-8">
             <h2 className="text-xl font-semibold mb-4">Content</h2>
-            <p>{post.content}</p>
+            <p>{post.content.postContent}</p>
           </div>
         </div>
       </div>
 
       {/* Comments Section */}
-      <div className="mt-12">
+      {/* <div className="mt-12">
         <h2 className="text-2xl font-semibold mb-6">Comments</h2>
         {post.comments.length > 0 ? (
           <div className="space-y-4">
@@ -118,7 +125,7 @@ const BlogDetail = () => {
             No comments yet. Be the first to comment!
           </p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

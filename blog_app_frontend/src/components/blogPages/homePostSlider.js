@@ -1,28 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import useAllPostData from "../utils/useAllPostData";
 
-const slides = [
-  {
-    image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&q=80',
-    title: 'Switching From Photography to UX Design: Everything You Need to Know',
-    subtitle: 'A Journey of Creative Evolution',
-    description: 'Viola LeBlanc is a 23-year-old photographer and product designer from Toronto, Ontario. She has worked with Spotify, Nike, Chews, Makr, and Square. Sophia Munn asked her a few questions about her work.'
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&q=80',
-    title: 'The Future of Digital Design',
-    subtitle: 'Trends That Will Shape Tomorrow',
-    description: 'Explore the emerging trends and technologies that are revolutionizing the digital design landscape.'
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80',
-    title: 'Mastering the Art of Visual Storytelling',
-    subtitle: 'From Concept to Creation',
-    description: 'Learn how to craft compelling visual narratives that engage and inspire your audience.'
-  }
-];
+// const slides = [
+//   {
+//     image:
+//       "https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&q=80",
+//     title:
+//       "Switching From Photography to UX Design: Everything You Need to Know",
+//     subtitle: "A Journey of Creative Evolution",
+//     description:
+//       "Viola LeBlanc is a 23-year-old photographer and product designer from Toronto, Ontario. She has worked with Spotify, Nike, Chews, Makr, and Square. Sophia Munn asked her a few questions about her work.",
+//   },
+//   {
+//     image:
+//       "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&q=80",
+//     title: "The Future of Digital Design",
+//     subtitle: "Trends That Will Shape Tomorrow",
+//     description:
+//       "Explore the emerging trends and technologies that are revolutionizing the digital design landscape.",
+//   },
+//   {
+//     image:
+//       "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80",
+//     title: "Mastering the Art of Visual Storytelling",
+//     subtitle: "From Concept to Creation",
+//     description:
+//       "Learn how to craft compelling visual narratives that engage and inspire your audience.",
+//   },
+// ];
 
 const Hero = () => {
+  const allPostData = useAllPostData();
+  console.log(allPostData);
+  const slides = [];
+  if (allPostData?.length>1) {
+    for (let i = 0; i < 3; i++) {
+      slides.push(allPostData[i]);
+    }
+  }
+  console.log(slides);
+  
+
+  // console.log(Array.isArray(allPostData));
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -45,7 +65,7 @@ const Hero = () => {
       {/* Image Slider */}
       <div className="absolute inset-0 ">
         <img
-          src={slides[currentSlide].image}
+          src={slides[currentSlide]?.posterUrl}
           alt="Hero"
           className="w-full h-full object-cover transition-opacity duration-500"
         />
@@ -61,13 +81,13 @@ const Hero = () => {
               Featured
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4">
-              {slides[currentSlide].title}
+              {slides[currentSlide]?.title}
             </h1>
             <p className="text-xl text-blue-100 mb-4">
-              {slides[currentSlide].subtitle}
+              {slides[currentSlide]?.description}
             </p>
             <p className="text-lg text-gray-200 mb-8">
-              {slides[currentSlide].description}
+              {slides[currentSlide]?.summary}
             </p>
             <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
               Read More
@@ -97,7 +117,7 @@ const Hero = () => {
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={`w-2 h-2 rounded-full transition ${
-              currentSlide === index ? 'bg-white' : 'bg-white/50'
+              currentSlide === index ? "bg-white" : "bg-white/50"
             }`}
           />
         ))}

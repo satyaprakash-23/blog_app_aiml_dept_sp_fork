@@ -115,12 +115,14 @@ const Navbar = () => {
             </Link>
 
             {isAdmin ? (
-              <a
-                href="#"
-                className="text-gray-700 hover:text-blue-600 transition"
-              >
-                My Posts
-              </a>
+              <Link to="/my-posts">
+                <a
+                  href="#"
+                  className="text-gray-700 hover:text-blue-600 transition"
+                >
+                  My Posts
+                </a>
+              </Link>
             ) : null}
 
             {isAdmin ? (
