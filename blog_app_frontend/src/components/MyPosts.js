@@ -1,8 +1,12 @@
+import useUserPost from "./utils/useUserPost";
+import CardsGridsDesign from "./utils/CardsGridDesign";
+const MyPosts = () => {
+  const userPosts = useUserPost();
+  console.log(userPosts);
 
-const MyPosts = () =>{
-    return (
-        <h1>hello</h1>
-    )
-}
+  return (
+    <CardsGridsDesign data={userPosts}/>
+  );
+};
 
 export default MyPosts;
