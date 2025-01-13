@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Content } from "../models/content.model.js";
 import { Post } from "../models/post.model.js";
 import {GoogleGenerativeAI} from "@google/generative-ai"
@@ -7,7 +8,7 @@ const generatePostMetadata = async (title, description, content) => {
   // 1. Construct the User Prompt
   const userPrompt = `Blog Title: ${title}\nDescription: ${description}\nContent: ${content}\n\nPlease provide response in JSON format having fields "summary" "minutesRead" and "tags". Just give me the "result" such that, the "result.response.text()" is in this form:- \n 
   {
-  "summary": "Post's Summary",
+  "summary": "Post's Summary not more than 450 letters.",
   "minutesRead": intValue,
   "tags": [
     "tag_1",
@@ -246,4 +247,50 @@ const getAllPosts = async (req, res) => {
 
 export { createPost, getPost, getUserPosts, getAllPosts };
 
-
+// const posts = await Post.aggregate([
+//   {
+//     $match: {
+//       _id: new mongoose.Types.ObjectId(req.params.postId),
+//     },
+//   }, // So we have the post of whose postId is given in the params. Ab iss data mei we have to add in comments and views
+//   {
+//     $lookup: {
+//       from: "likes",
+//       localField: "_id",
+//       foreignField: "postId",
+//       as: "likes",
+//     },
+//   }, // So, now we have all the Docs of "views DB's" jinmei "postId" jo h wo params mei diye hue id ke barabar hai.
+//   {
+//     $lookup: {
+//       from: "comments",
+//       localField: "_id",
+//       foreignField: "postId",
+//       as: "comments",
+//     },
+//   }, // So, now we have all the Docs of "comment DB's" jinmei "postId" jo h wo params mei diye hue id ke barabar hai.
+//   // Ok, so ab apne ko return karna hai "likesCount" and "comments ka array"
+//   {
+//     $addFields: {
+//       likesCount: {
+//         $size: "$likes",
+//       },
+//       comments: "$comment",
+//     },
+//   },
+//   {
+//     $project: {
+//       _id: 1,
+//       title: 1,
+//       description: 1,
+//       posterUrl: 1,
+//       content: 1,
+//       author: 1,
+//       summary: 1,
+//       minutesRead: 1,
+//       tags: 1,
+//       likesCount: 1,
+//       comments: 1,
+//     },
+//   },
+// ]);

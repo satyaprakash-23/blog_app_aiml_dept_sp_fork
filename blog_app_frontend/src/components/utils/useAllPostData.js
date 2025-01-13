@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom";
 
 
 const useAllPostData = ()=>{
     const [AllPostData,setAllPostData] = useState(null);
+    const navigate = useNavigate()
     
     async function getAllPostData() {
         const response = await fetch("http://localhost:4800/api/v1/post/getAllPosts");
@@ -19,9 +21,10 @@ const useAllPostData = ()=>{
         //     console.log("NULL",response);
         // }
     }
-    useEffect(()=>{
-        getAllPostData();
-    },[]);
+
+    useEffect(() => {
+      getAllPostData();
+    }, [navigate]);
 
     return AllPostData;
 }

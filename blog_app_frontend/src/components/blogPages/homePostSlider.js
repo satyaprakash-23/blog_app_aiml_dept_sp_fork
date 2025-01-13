@@ -1,54 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useAllPostData from "../utils/useAllPostData";
-
-// const slides = [
-//   {
-//     image:
-//       "https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&q=80",
-//     title:
-//       "Switching From Photography to UX Design: Everything You Need to Know",
-//     subtitle: "A Journey of Creative Evolution",
-//     description:
-//       "Viola LeBlanc is a 23-year-old photographer and product designer from Toronto, Ontario. She has worked with Spotify, Nike, Chews, Makr, and Square. Sophia Munn asked her a few questions about her work.",
-//   },
-//   {
-//     image:
-//       "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&q=80",
-//     title: "The Future of Digital Design",
-//     subtitle: "Trends That Will Shape Tomorrow",
-//     description:
-//       "Explore the emerging trends and technologies that are revolutionizing the digital design landscape.",
-//   },
-//   {
-//     image:
-//       "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80",
-//     title: "Mastering the Art of Visual Storytelling",
-//     subtitle: "From Concept to Creation",
-//     description:
-//       "Learn how to craft compelling visual narratives that engage and inspire your audience.",
-//   },
-// ];
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   const allPostData = useAllPostData();
-  console.log(allPostData);
+  // console.log("allPostData.length: ", allPostData?.length);
   const slides = [];
-  if (allPostData?.length>1) {
+  // console.log("1) slides length at initialization: ", slides.length);
+
+  const handleCardClick = (project_id) => {
+    console.log("I got clicked.");
+    console.log(project_id);
+    navigate(`/all-posts/${project_id}`);
+  };  
+
+
+  if (allPostData?.length > 1) {
     for (let i = 0; i < 3; i++) {
       slides.push(allPostData[i]);
     }
   }
-  console.log(slides);
-  
+  // console.log("Here are the slides: ",slides);
+  // console.log("2) slides length at after initialization: ", slides.length);
 
   // console.log(Array.isArray(allPostData));
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // NOTE: {slides?.length} is 0 for the very first time. And division by "0" is undefined. So there only the code breaks!!...
+  // ... After the given time delay (3sec), when the timer function runs, then it encountered this ((prev + 1) % slides?.length) which was an invalid operation as division by 0 is undefined. Hence the error!
+  // Ok, means as useEffect used stale value of "slides" (0), so, after 1 second time interval, when the division process ran, 
+  // it set the "currentSlides" to "NaN" and hence slides[undefined] resulted to null.
+
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
+      setCurrentSlide((prev) => (prev + 1) % 3);
+      // console.log("Current Slide (index): ",currentSlide);
+      // console.log("3) slides length in useEffect: ", slides.length);
+    }, 3000);
+
     return () => clearInterval(timer);
   }, []);
 
@@ -89,7 +80,10 @@ const Hero = () => {
             <p className="text-lg text-gray-200 mb-8">
               {slides[currentSlide]?.summary}
             </p>
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+            <button
+              onClick={() => handleCardClick(slides[currentSlide]?._id)}
+              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
               Read More
             </button>
           </div>

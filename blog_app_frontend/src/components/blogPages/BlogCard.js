@@ -35,7 +35,7 @@ const BlogCard = ({ post, onClick }) => {
           <img 
             src={post.author.avatarUrl} 
             alt={post.author.name}
-            className="w-6 h-6 rounded-full mr-2"
+            className="w-6 rounded-full mr-2"
           />
           <span>{post.author.name}</span>
           <span className="mx-2">•</span>

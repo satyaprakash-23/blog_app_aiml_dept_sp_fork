@@ -39,3 +39,8 @@ const postSchema = new mongoose.Schema({
 const Post = mongoose.model("Post", postSchema);
 
 export {Post};
+
+/*
+summary: 450 characters
+description: 15 words ~ 70 characters
+*/

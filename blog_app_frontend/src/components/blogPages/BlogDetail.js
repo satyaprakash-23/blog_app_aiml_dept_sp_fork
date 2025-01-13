@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Heart, MessageCircle, Settings } from "lucide-react";
-import { blogPosts } from "./blogData";
+// import { blogPosts } from "./blogData";
 import { useSelector } from "react-redux";
 import Tooltip from "./Tooltip";
-import useAllPostData from "../utils/useAllPostData";
+// import useAllPostData from "../utils/useAllPostData";
 import usePostDetail from "../utils/usePostDetail";
 
 const BlogDetail = () => {
@@ -99,7 +99,7 @@ const BlogDetail = () => {
 
           <div className="bg-gray-50 p-6 rounded-lg mb-8">
             <h2 className="text-xl font-semibold mb-4">Content</h2>
-            <p>{post.content.postContent}</p>
+            <p>{post?.content?.postContent}</p>
           </div>
         </div>
       </div>
