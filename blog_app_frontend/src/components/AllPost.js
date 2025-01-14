@@ -21,7 +21,7 @@ const AllPost = () => {
   
   return (
     <>
-    <CardsGridDesign data={allPostData} />;
+    <CardsGridDesign data={allPostData} />
     </>
     // <>
     // <CardsGridDesign data={allPostData} />

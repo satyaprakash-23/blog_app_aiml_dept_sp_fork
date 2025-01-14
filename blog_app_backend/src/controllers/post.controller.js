@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Content } from "../models/content.model.js";
 import { Post } from "../models/post.model.js";
 import {GoogleGenerativeAI} from "@google/generative-ai"
+import { Appreciation } from "../models/appreciation.model.js";
 
 // Code for a Function to Call the GPT API
 const generatePostMetadata = async (title, description, content) => {
@@ -162,6 +163,10 @@ const createPost = async (req, res) => {
 const getPost = async(req, res) => {
   // const postId = req.params; -> Wrong!!
   const postId = req.params.postId;
+  const userId = req.body?._id;
+  console.log("getPost userId: ", userId);
+  
+
   // or:- const { postId } = req.params;
 
   if (!postId) {
@@ -170,25 +175,125 @@ const getPost = async(req, res) => {
 
   try {
     // Fetch the post from the database
-    const queriedPost = await Post.findById(postId)
-      .populate({
-        path: "content", // Populate the content field
-        select: "postContent", // Only include 'postContent' field from Content schema
-      })
-      .populate({
-        path: "author", // Populate the author field
-        select: "name email avatarUrl", // Include only the name and email fields
-      });
+
+    // Using aggregation directly in place of "populate()"
+    // const queriedPost = await Post.findById(postId)
+    //   .populate({
+    //     path: "content", // Populate the content field
+    //     select: "postContent", // Only include 'postContent' field from Content schema
+    //   })
+    //   .populate({
+    //     path: "author", // Populate the author field
+    //     select: "name email avatarUrl", // Include only the name and email fields
+    //   });
+
+    // Check if the post is liked by this user
+    let isLikedByThisUser = false; // Default to false
+    if (userId) {
+      isLikedByThisUser =
+        (await Appreciation.countDocuments({
+          appreciatedBy: userId,
+          postId: postId,
+        })) > 0;
+    }
+
+    const queriedPost = await Post.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(req.params.postId),
+        },
+      }, // So we have the post of whose postId is given in the params. Ab iss data mei we have to add in comments and views
+      {
+        $lookup: {
+          from: "appreciations",
+          localField: "_id",
+          foreignField: "postId",
+          as: "likes",
+        },
+      }, // So, now we have all the Docs of "views DB's" jinmei "postId" jo h wo params mei diye hue id ke barabar hai.
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "postId",
+          as: "comments",
+        },
+      }, // So, now we have all the Docs of "comment DB's" jinmei "postId" jo h wo params mei diye hue id ke barabar hai.
+      // Ok, so ab apne ko return karna hai "likesCount" and "comments ka array"
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      {
+        $unwind: "$author", // Ensure the author field is a single object
+      },
+      {
+        $lookup: {
+          from: "contents", // The name of the comments collection
+          localField: "content",
+          foreignField: "_id",
+          as: "content",
+        },
+      },
+      {
+        $unwind: "$content", // Ensure the content field is a single object
+      },
+      {
+        $addFields: {
+          likesCount: {
+            $size: "$likes",
+          },
+          // comments: "$comment",
+        },
+      },
+      {
+        // $project: {
+        //   _id: 1,
+        //   title: 1,
+        //   description: 1,
+        //   posterUrl: 1,
+        //   content: 1,
+        //   author: 1,
+        //   summary: 1,
+        //   minutesRead: 1,
+        //   tags: 1,
+        //   likesCount: 1,
+        //   comments: 1,
+        // },
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          posterUrl: 1,
+          content: "$content.postContent", // Include only 'postContent' from content
+          author: {
+            name: "$author.name",
+            email: "$author.email",
+            avatarUrl: "$author.avatarUrl",
+          },
+          summary: 1,
+          minutesRead: 1,
+          tags: 1,
+          likesCount: 1,
+          comments: 1,
+        },
+      },
+    ]);
 
     // Check if post exists
-    if (!queriedPost) {
+    if (!queriedPost || queriedPost.length === 0) {
       return res.status(404).json({ error: "No post found with that postId!" });
     }
 
     // Return the post if found
     return res.status(200).json({
       message: "Post retrieved successfully!",
-      queriedPost,
+      queriedPost: queriedPost[0],
+      isLikedByThisUser,
     });
   } catch (err) {
     // Handle any errors during the query process
@@ -222,16 +327,76 @@ const getUserPosts = async (req, res) => {
   }
 };
 
+// const getAllPosts = async (req, res) => {
+//   try {
+//     // Fetch all posts from the database
+//     const posts = await Post.find()
+//     .populate("author", "name email avatarUrl") // Optionally populate author's name and email
+//     .exec();
+    
+//     // .populate("content", "postContent") // Populate the 'content' field to include postContent -> content not needed as of now.
+
+//     // Respond with all posts
+//     return res.status(200).json({
+//       success: true,
+//       data: posts,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching all posts:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch posts",
+//     });
+//   }
+// };
+
 const getAllPosts = async (req, res) => {
   try {
-    // Fetch all posts from the database
-    const posts = await Post.find()
-    .populate("author", "name email avatarUrl") // Optionally populate author's name and email
-    .exec();
-    
-    // .populate("content", "postContent") // Populate the 'content' field to include postContent -> content not needed as of now.
+    const posts = await Post.aggregate([
+      // Step 1: Fetch all posts
+      {
+        $lookup: {
+          from: "users", // Populate author field from the users collection
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      {
+        $unwind: "$author", // Unwind the author array (since lookup returns an array)
+      },
+      {
+        $lookup: {
+          from: "appreciations", // Lookup likes related to each post
+          localField: "_id",
+          foreignField: "postId",
+          as: "likes",
+        },
+      },
+      {
+        $addFields: {
+          likesCount: { $size: "$likes" }, // Add a new field 'likesCount' with the size of the likes array
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          posterUrl: 1,
+          summary: 1,
+          minutesRead: 1,
+          tags: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          author: { name: 1, email: 1, avatarUrl: 1 }, // Include only the necessary fields from the author
+          likesCount: 1, // Include the calculated likesCount
+          // Add content if required in the future
+        },
+      },
+    ]);
 
-    // Respond with all posts
+    // Respond with the aggregated posts
     return res.status(200).json({
       success: true,
       data: posts,
@@ -245,52 +410,6 @@ const getAllPosts = async (req, res) => {
   }
 };
 
+
 export { createPost, getPost, getUserPosts, getAllPosts };
 
-// const posts = await Post.aggregate([
-//   {
-//     $match: {
-//       _id: new mongoose.Types.ObjectId(req.params.postId),
-//     },
-//   }, // So we have the post of whose postId is given in the params. Ab iss data mei we have to add in comments and views
-//   {
-//     $lookup: {
-//       from: "likes",
-//       localField: "_id",
-//       foreignField: "postId",
-//       as: "likes",
-//     },
-//   }, // So, now we have all the Docs of "views DB's" jinmei "postId" jo h wo params mei diye hue id ke barabar hai.
-//   {
-//     $lookup: {
-//       from: "comments",
-//       localField: "_id",
-//       foreignField: "postId",
-//       as: "comments",
-//     },
-//   }, // So, now we have all the Docs of "comment DB's" jinmei "postId" jo h wo params mei diye hue id ke barabar hai.
-//   // Ok, so ab apne ko return karna hai "likesCount" and "comments ka array"
-//   {
-//     $addFields: {
-//       likesCount: {
-//         $size: "$likes",
-//       },
-//       comments: "$comment",
-//     },
-//   },
-//   {
-//     $project: {
-//       _id: 1,
-//       title: 1,
-//       description: 1,
-//       posterUrl: 1,
-//       content: 1,
-//       author: 1,
-//       summary: 1,
-//       minutesRead: 1,
-//       tags: 1,
-//       likesCount: 1,
-//       comments: 1,
-//     },
-//   },
-// ]);

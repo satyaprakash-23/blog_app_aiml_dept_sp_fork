@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Heart, MessageCircle, Settings } from "lucide-react";
 // import { blogPosts } from "./blogData";
@@ -13,14 +13,53 @@ const BlogDetail = () => {
   const postDetail = usePostDetail(id);
   const post = postDetail?.queriedPost;
   // const post = postDetail?.find((post) => post._id === id);
-  console.log(post);
+  console.log("Individual post: ", post);
   
-
+  
   // const userData = useSelector((state) => state.auth.userData);
   const { isLoggedIn, userData } = useSelector((state) => state.auth);
   const isAdmin = userData?.isAdmin;
   // const isLoggedIn = userData?.isLoggedIn;
-  console.log("now" + isLoggedIn);
+  console.log("Is logged in: " + isLoggedIn);
+
+  const [isPostLikedByThisUser, setIsPostLikedByThisUser] = useState(null);
+  const [likes, setLikes] = useState(null);
+
+  useEffect(() => {
+    setLikes(post?.likesCount);
+    setIsPostLikedByThisUser(postDetail?.isLikedByThisUser);
+  }, [post, postDetail]);
+  // console.log("likes: ", likes);
+
+  const handleLikeButtonClick = async (postId) => {
+    async function likeDislikeApi() {
+      const response = await fetch(
+        "http://localhost:4800/api/v1/appreciation/likeDislike",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Required for cookies in cross-origin requests
+          body: JSON.stringify({
+            postId
+          }),
+        }
+      );
+      const jsonResponse = await response.json();
+      if (jsonResponse.message === "Post liked!") {
+        console.log("likeDislike Button message: ", jsonResponse.message);
+        setLikes((prev) => prev + 1);
+        setIsPostLikedByThisUser((prev) => (!prev));
+      } else {
+        console.log("likeDislike Button message: ", jsonResponse.message);
+        setLikes((prev) => prev - 1);
+        setIsPostLikedByThisUser((prev) => !prev);
+      }
+
+    }
+    likeDislikeApi();
+  }
   
 
   if (!post) {
@@ -51,14 +90,14 @@ const BlogDetail = () => {
         </Tooltip>
       </div>
 
-      <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
+      <h1 className="text-4xl font-bold mb-8">{post?.title}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Cover Image */}
         <div className="lg:col-span-3">
           <img
-            src={post.posterUrl}
-            alt={post.title}
+            src={post?.posterUrl}
+            alt={post?.title}
             className="w-full rounded-lg shadow-lg"
           />
           {/* Interaction Buttons */}
@@ -70,9 +109,25 @@ const BlogDetail = () => {
                     ? "cursor-pointer hover:text-rose-700"
                     : "cursor-not-allowed text-rose-300"
                 }`}
+                onClick={() => handleLikeButtonClick(post?._id)}
+                disabled={isLoggedIn ? false : true}
               >
-                <Heart className="w-6 h-6" />
-                <span>{post?.appreciationCount}</span>
+                {isPostLikedByThisUser ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6 text-red-500"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                ) : (
+                  <Heart className="w-6 h-6" />
+                )}
+                {/* <Heart
+                  className={isPostLikedByThisUser ? "w-6 h-6 bg-black" : "w-6 h-6"}
+                /> */}
+                <span>{likes}</span>
               </button>
             </Tooltip>
             <Tooltip message="Login first" show={!isLoggedIn}>
@@ -82,6 +137,7 @@ const BlogDetail = () => {
                     ? "cursor-pointer hover:text-gray-700"
                     : "cursor-not-allowed text-gray-300"
                 }`}
+                disabled={isLoggedIn ? false : true}
               >
                 <MessageCircle className="w-6 h-6" />
                 <span>{post?.comments?.length}</span>
@@ -94,7 +150,7 @@ const BlogDetail = () => {
         <div className="lg:col-span-2">
           <div className="bg-gray-50 p-6 rounded-lg mb-8">
             <h2 className="text-xl font-semibold mb-4">Summary</h2>
-            <p className="text-gray-600">{post.summary}</p>
+            <p className="text-gray-600">{post?.summary}</p>
           </div>
 
           <div className="bg-gray-50 p-6 rounded-lg mb-8">
