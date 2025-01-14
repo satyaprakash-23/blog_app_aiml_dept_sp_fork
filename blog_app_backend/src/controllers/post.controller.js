@@ -307,13 +307,68 @@ const getUserPosts = async (req, res) => {
   try {
     const userId = req.user._id; // Extract the logged-in user's ID from the request object
 
-    // Find posts where the author matches the logged-in user's ID
-    const posts = await Post.find({ author: userId })
-      .populate("content", "postContent") // Populate the 'content' field to include postContent
-      .populate("author", "name email avatarUrl") // Optionally populate author's name and email
-      .exec();
+    // // Find posts where the author matches the logged-in user's ID
+    // const posts = await Post.find({ author: userId })
+    //   .populate("content", "postContent") // Populate the 'content' field to include postContent
+    //   .populate("author", "name email avatarUrl") // Optionally populate author's name and email
+    //   .exec();
 
-    // Respond with the posts
+    // // Respond with the posts
+    // return res.status(200).json({
+    //   success: true,
+    //   data: posts,
+    // });
+
+    const posts = await Post.aggregate([
+      {
+        $match: {
+          author: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      // Step 1: Fetch all posts
+      {
+        $lookup: {
+          from: "users", // Populate author field from the users collection
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      {
+        $unwind: "$author", // Unwind the author array (since lookup returns an array)
+      },
+      {
+        $lookup: {
+          from: "appreciations", // Lookup likes related to each post
+          localField: "_id",
+          foreignField: "postId",
+          as: "likes",
+        },
+      },
+      {
+        $addFields: {
+          likesCount: { $size: "$likes" }, // Add a new field 'likesCount' with the size of the likes array
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          posterUrl: 1,
+          summary: 1,
+          minutesRead: 1,
+          tags: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          author: { name: 1, email: 1, avatarUrl: 1 }, // Include only the necessary fields from the author
+          likesCount: 1, // Include the calculated likesCount
+          // Add content if required in the future
+        },
+      },
+    ]);
+
+    // Respond with the aggregated posts
     return res.status(200).json({
       success: true,
       data: posts,
