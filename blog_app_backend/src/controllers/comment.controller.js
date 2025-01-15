@@ -36,4 +36,32 @@ const addComment = async (req, res) => {
   }
 };
 
-export { addComment };
+const getPostComments = async (req, res) => {
+  try {
+    const { postId } = req.params; // Extract postId from the request parameters
+
+    // Check if postId is provided
+    if (!postId) {
+      return res.status(400).json({
+        message: "Post ID is required.",
+      });
+    }
+
+    // Find all comments for the given postId
+    const comments = await Comment.find({ postId });
+
+    // Return the comments
+    return res.status(200).json({
+      message: "Comments retrieved successfully.",
+      comments,
+    });
+  } catch (error) {
+    console.error("Error in getPostComments controller:", error);
+    return res.status(500).json({
+      message: "Internal server error.",
+      error: error.message,
+    });
+  }
+};
+
+export { addComment, getPostComments };

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Content } from "../models/content.model.js";
 import { Post } from "../models/post.model.js";
-import {GoogleGenerativeAI} from "@google/generative-ai"
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Appreciation } from "../models/appreciation.model.js";
 
 // Code for a Function to Call the GPT API
@@ -43,7 +43,7 @@ Ofcourse it will be stringified, but I can simply do  JSON.parse() on it to retu
     // console.log(result.response);
     console.log("Tpe of the response: ", typeof slicedResponse);
     // console.log("Actual response: ", response);
-    
+
     const jsonResponse = JSON.parse(slicedResponse); // Parse the stringified JSON
     console.log(jsonResponse);
     return jsonResponse; // Return the parsed JSON
@@ -66,7 +66,7 @@ const createPost = async (req, res) => {
     const author = req.user._id;
 
     if (!author) {
-        return res.status(401).json({ error: "Unauthorized request!" });
+      return res.status(401).json({ error: "Unauthorized request!" });
     }
 
     if (
@@ -82,9 +82,9 @@ const createPost = async (req, res) => {
 
     // Step 3: Generate metadata using OpenAI
     const { summary, minutesRead, tags } = await generatePostMetadata(
-        title,
-        description,
-        content
+      title,
+      description,
+      content
     );
 
     console.log("summary: ", summary);
@@ -122,8 +122,7 @@ const createPost = async (req, res) => {
     // const summary = responseFromTheLLM.summary;
     // const minutesRead = responseFromTheLLM.minutesRead;
     // const tags = responseFromTheLLM.tags;
-    
-    
+
     // Step 2: Save the content in the Content model
     const newContent = new Content({ postContent: content }); // Assuming `text` is the content field
     const savedContent = await newContent.save();
@@ -160,12 +159,11 @@ const createPost = async (req, res) => {
   }
 };
 
-const getPost = async(req, res) => {
+const getPost = async (req, res) => {
   // const postId = req.params; -> Wrong!!
   const postId = req.params.postId;
   const userId = req.body?._id;
   console.log("getPost userId: ", userId);
-  
 
   // or:- const { postId } = req.params;
 
@@ -217,6 +215,25 @@ const getPost = async(req, res) => {
           localField: "_id",
           foreignField: "postId",
           as: "comments",
+          pipeline: [
+            {
+              $lookup: {
+                from: "users",
+                localField: "commentedBy",
+                foreignField: "_id",
+                as: "commentedBy",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: 1,
+                      name: 1,
+                      avatarUrl: 1,
+                    },
+                  },
+                ],
+              },
+            },
+          ],
         },
       }, // So, now we have all the Docs of "comment DB's" jinmei "postId" jo h wo params mei diye hue id ke barabar hai.
       // Ok, so ab apne ko return karna hai "likesCount" and "comments ka array"
@@ -241,6 +258,35 @@ const getPost = async(req, res) => {
       },
       {
         $unwind: "$content", // Ensure the content field is a single object
+      },
+      {
+        $lookup: {
+          from: "posts",
+          let: { currentAuthor: "$author._id", currentPostId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$author", "$$currentAuthor"] }, // Match same author
+                    { $ne: ["$_id", "$$currentPostId"] }, // Exclude the current post
+                  ],
+                },
+              },
+            },
+            {
+              $project: {
+                title: 1,
+                description: 1,
+                posterUrl: 1,
+                createdAt: 1,
+                minutesRead: 1,
+                likesCount: 1,
+              },
+            },
+          ],
+          as: "otherPostsByThisPostAuthor",
+        },
       },
       {
         $addFields: {
@@ -280,6 +326,7 @@ const getPost = async(req, res) => {
           tags: 1,
           likesCount: 1,
           comments: 1,
+          otherPostsByThisPostAuthor: 1,
         },
       },
     ]);
@@ -301,7 +348,7 @@ const getPost = async(req, res) => {
       .status(500)
       .json({ error: "An error occurred while retrieving the post!" });
   }
-}
+};
 
 const getUserPosts = async (req, res) => {
   try {
@@ -388,7 +435,7 @@ const getUserPosts = async (req, res) => {
 //     const posts = await Post.find()
 //     .populate("author", "name email avatarUrl") // Optionally populate author's name and email
 //     .exec();
-    
+
 //     // .populate("content", "postContent") // Populate the 'content' field to include postContent -> content not needed as of now.
 
 //     // Respond with all posts
@@ -465,6 +512,4 @@ const getAllPosts = async (req, res) => {
   }
 };
 
-
 export { createPost, getPost, getUserPosts, getAllPosts };
-

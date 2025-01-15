@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Heart, MessageCircle, Settings } from "lucide-react";
+import { Heart, MessageCircle, Settings, Sparkles } from "lucide-react";
 import { useSelector } from "react-redux";
 import Tooltip from "./Tooltip";
 import usePostDetail from "../utils/usePostDetail";
@@ -138,7 +138,9 @@ const BlogDetail = () => {
                 disabled={!isLoggedIn}
               >
                 <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span className="text-sm sm:text-base">{post?.comments?.length}</span>
+                <span className="text-sm sm:text-base">
+                  {post?.comments?.length}
+                </span>
               </button>
             </Tooltip>
           </div>
@@ -148,13 +150,25 @@ const BlogDetail = () => {
         <div className="lg:col-span-2 flex flex-col justify-between space-y-4 sm:space-y-6">
           <div className="flex flex-col justify-between align-baseline space-y-4">
             <div className="bg-gray-50 p-4 sm:p-6 rounded-lg">
-              <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">Summary</h2>
-              <p className="text-gray-600 text-sm sm:text-base">{post?.summary}</p>
+              <div className="flex justify-between">
+                <div className="h-full flex items-center ">
+                  <h2 className=" text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
+                    Summary
+                  </h2>
+                </div>
+                <div className="flex items-start">
+                  <Sparkles width={16} />
+                  <h2 className="text-xs relative top-1">AI generated</h2>
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm sm:text-base">
+                {post?.summary}
+              </p>
             </div>
             <div className="w-full">
               <button
                 type="button"
-                className="w-full text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 sm:px-5 py-2 sm:py-2.5 text-center inline-flex items-center justify-center"
+                className="w-full text-white bg-[#1D4ED8] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 sm:px-5 py-2 sm:py-2.5 text-center inline-flex items-center justify-center"
                 onClick={handleOpenModal}
               >
                 Read Full Blog Content Here
@@ -171,22 +185,34 @@ const BlogDetail = () => {
 
         {/* Comments Section */}
         <div className="lg:col-span-3 mt-6 lg:mt-0">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Comments</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
+            Comments
+          </h2>
           <CommentEditor />
           {post.comments.length > 0 ? (
             <div className="space-y-3 sm:space-y-4 mt-3">
               {post.comments.map((comment) => (
-                <div key={comment._id} className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                <div
+                  key={comment._id}
+                  className="bg-gray-50 p-3 sm:p-4 rounded-lg"
+                >
                   <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <img
+                      src={comment.commentedBy[0].avatarUrl}
+                      alt={post.author.name}
+                      className="w-6 rounded-full "
+                    />
                     <span className="font-medium text-sm sm:text-base">
-                      {comment.commentedBy}
+                      {comment.commentedBy[0].name}
                     </span>
                     <span className="text-gray-400">•</span>
                     <span className="text-gray-600 text-xs sm:text-sm">
                       {formatDateTime(comment.createdAt)}
                     </span>
                   </div>
-                  <p className="text-gray-700 text-sm sm:text-base">{comment.comment}</p>
+                  <p className="text-gray-700 text-sm sm:text-base">
+                    {comment.comment}
+                  </p>
                 </div>
               ))}
             </div>
