@@ -7,10 +7,12 @@ import usePostDetail from "../utils/usePostDetail";
 import Modal from "./Modal";
 import CommentEditor from "./CommentEditor";
 import formatDateTime from "../utils/formatDateTime";
+import BlogCard from "./BlogCard";
 
 const BlogDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  // const [postDetail, setPostDetail] = useState(usePostDetail(id));
   const postDetail = usePostDetail(id);
   const post = postDetail?.queriedPost;
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +26,16 @@ const BlogDetail = () => {
 
   const [isPostLikedByThisUser, setIsPostLikedByThisUser] = useState(null);
   const [likes, setLikes] = useState(null);
+
+  const handleCardClick = (project_id) => {
+    // console.log("I got clicked.");
+    // console.log(project_id);
+    navigate(`/all-posts/${project_id}`);
+    // setPostDetail(usePostDetail(project_id));
+    setTimeout(() => {
+      window.location.reload();
+    }, 20)
+  };  
 
   useEffect(() => {
     setLikes(post?.likesCount);
@@ -73,28 +85,63 @@ const BlogDetail = () => {
         >
           ← Back
         </button>
-        <Tooltip message="Admin only" show={!userData?.isAdmin}>
-          <button
-            className={`text-gray-600 ${
-              userData?.isAdmin
-                ? "cursor-pointer hover:text-gray-900"
-                : "cursor-not-allowed"
-            }`}
-            disabled={!userData?.isAdmin}
-          >
-            <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-        </Tooltip>
+        {isLoggedIn ? (
+          userData._id === post.author._id ? (
+            <button
+              className={`text-gray-600 ${
+                userData?.isAdmin
+                  ? "cursor-pointer hover:text-gray-900"
+                  : "cursor-not-allowed"
+              }`}
+              // disabled={!userData?.isAdmin}
+            >
+              <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          ) : (
+            <Tooltip message="Not the author" show={true}>
+              <button
+                className={`text-gray-600 cursor-not-allowed`}
+                disabled={true}
+              >
+                <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </Tooltip>
+          )
+        ) : (
+          <Tooltip message="Login first" show={!userData?.isAdmin}>
+            <button
+              className={`text-gray-600 ${
+                userData?.isAdmin
+                  ? "cursor-pointer hover:text-gray-900"
+                  : "cursor-not-allowed"
+              }`}
+              disabled={!userData?.isAdmin}
+            >
+              <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </Tooltip>
+        )}
       </div>
 
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 lg:mb-8">
-        {post?.title}
-      </h1>
+      <div className=" flex flex-col justify-between items-start">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+          {post?.title}
+        </h1>
+        <h1 className=" flex items-center my-2">
+          <span className="opacity-60 mr-1">Author:</span>
+          {/* <img
+            src={post?.author?.avatarUrl}
+            alt={post?.title}
+            className="w-10 h-10 object-cover rounded-full shadow-lg mx-2"
+          />{" "} */}
+          <span className=" font-medium">{post?.author?.name}</span>
+        </h1>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
         {/* Cover Image and Interactions */}
         <div className="lg:col-span-3 space-y-4">
-          <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px]">
+          <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[450px]">
             <img
               src={post?.posterUrl}
               alt={post?.title}
@@ -184,13 +231,14 @@ const BlogDetail = () => {
         </div>
 
         {/* Comments Section */}
-        <div className="lg:col-span-3 mt-6 lg:mt-0">
+        <div className="lg:col-span-3 h-[60vh]">
           <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
             Comments
           </h2>
           <CommentEditor />
+
           {post.comments.length > 0 ? (
-            <div className="space-y-3 sm:space-y-4 mt-3">
+            <div className="space-y-3 sm:space-y-4 mt-3 bg-slate-200 p-3 h-[34vh] overflow-y-scroll rounded-xl">
               {post.comments.map((comment) => (
                 <div
                   key={comment._id}
@@ -221,6 +269,74 @@ const BlogDetail = () => {
               No comments yet. Be the first to comment!
             </p>
           )}
+        </div>
+
+        {/* otherPostsByThisAuthor */}
+        <div className="col-span-2 mt-3 bg-slate-200 p-3 h-[70vh]  rounded-xl overflow-y-scroll">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
+            More posts by {post?.author?.name}
+          </h2>
+          {post?.otherPostsByThisPostAuthor.map((indvPost) => {
+            return (
+              <div className="bg-white my-2 rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-150 cursor-default ">
+                <img
+                  src={indvPost.posterUrl}
+                  alt={indvPost.title}
+                  className="w-full h-24 object-cover"
+                />
+                <div className="p-4">
+                  <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
+                  <div className="flex items-center text-gray-600 text-xs mb-2">
+                    <img
+                      src={post?.author?.avatarUrl}
+                      alt={post?.author?.name}
+                      className="w-6 rounded-full mr-2"
+                    />
+                    <span>{post?.author?.name}</span>
+                    <span className="mx-2">•</span>
+                    <span>{formatDateTime(indvPost?.createdAt)}</span>
+                    <span className="mx-2">•</span>
+                    <span>{indvPost?.minutesRead}min read</span>
+                  </div>
+                  <div className="flex items-center text-rose-500 text-sm mb-3">
+                    {/* <span>
+                    {post?.likesCount > 0 ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-5 h-5 text-red-500 mr-1"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                      </svg>
+                    ) : (
+                      <Heart className="w-4 h-4 mr-1" />
+                    )}{" "}
+                  </span> */}
+
+                    {/* <span>
+                    {" "}
+                    {post.likesCount > 1
+                      ? ` ${post?.likesCount} appreciations`
+                      : ` ${post?.likesCount} appreciation`}{" "}
+                  </span> */}
+                  </div>
+                  <p className="text-gray-600 mb-4 line-clamp-3">
+                    {indvPost.description}
+                  </p>
+                  <button
+                    className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCardClick(indvPost._id);
+                    }}
+                  >
+                    Read More →
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -4,9 +4,6 @@ import formatDateTime from '../utils/formatDateTime';
 
 const BlogCard = ({ post, onClick }) => {
 
-
-  
-
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-150 cursor-default">
       <img
@@ -18,19 +15,19 @@ const BlogCard = ({ post, onClick }) => {
         <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
         <div className="flex items-center text-gray-600 text-xs mb-2">
           <img
-            src={post.author.avatarUrl}
-            alt={post.author.name}
+            src={post?.author?.avatarUrl}
+            alt={post?.author?.name}
             className="w-6 rounded-full mr-2"
           />
-          <span>{post.author.name}</span>
+          <span>{post?.author?.name}</span>
           <span className="mx-2">•</span>
-          <span>{formatDateTime(post.createdAt)}</span>
+          <span>{formatDateTime(post?.createdAt)}</span>
           <span className="mx-2">•</span>
-          <span>{post.minutesRead}min read</span>
+          <span>{post?.minutesRead}min read</span>
         </div>
         <div className="flex items-center text-rose-500 text-sm mb-3">
           <span>
-            {post.likesCount > 0 ? (
+            {post?.likesCount > 0 ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5 text-red-500 mr-1"
@@ -47,8 +44,8 @@ const BlogCard = ({ post, onClick }) => {
           <span>
             {" "}
             {post.likesCount > 1
-              ? ` ${post.likesCount} appreciations`
-              : ` ${post.likesCount} appreciation`}{" "}
+              ? ` ${post?.likesCount} appreciations`
+              : ` ${post?.likesCount} appreciation`}{" "}
           </span>
         </div>
         <p className="text-gray-600 mb-4 line-clamp-3">{post.description}</p>

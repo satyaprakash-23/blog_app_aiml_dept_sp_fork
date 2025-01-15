@@ -317,6 +317,7 @@ const getPost = async (req, res) => {
           posterUrl: 1,
           content: "$content.postContent", // Include only 'postContent' from content
           author: {
+            _id: "$author._id",
             name: "$author.name",
             email: "$author.email",
             avatarUrl: "$author.avatarUrl",
