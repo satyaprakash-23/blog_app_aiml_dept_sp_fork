@@ -14,6 +14,7 @@ import Modal from "./Modal";
 import CommentEditor from "./CommentEditor";
 import formatDateTime from "../utils/formatDateTime";
 import BlogCard from "./BlogCard";
+import AddComment from "../utils/AddComment";
 
 const BlogDetail = () => {
   const navigate = useNavigate();
@@ -76,6 +77,21 @@ const BlogDetail = () => {
     }
     likeDislikeApi();
   };
+  //comment useState
+  const [apiResponse, setApiResponse] = useState(null);
+  // const requestData = {
+  //   postId: "678382fff7228de2bbde8294",
+  //   comment: "SpaceX 101",
+  // };
+  
+  
+  const [postComments,setpostComments] = useState(null);
+  useEffect(()=>{
+    setpostComments(post?.comments)
+  },[post])
+
+  
+  
 
   if (!post) {
     return <p>Post not found!</p>;
@@ -246,11 +262,23 @@ const BlogDetail = () => {
           </h2>
 
           {/* Add Comment section */}
-          <CommentEditor />
+          <CommentEditor
+          
+        
+            postComments = {postComments}
+            setpostComments = {setpostComments}
+            sentPostId={post._id}
+            
+          />
+
+          
+          {console.log("commentResponse")}
+          {console.log(apiResponse)}
 
           {post.comments.length > 0 ? (
             <div className="space-y-3 sm:space-y-4 mt-3 bg-slate-200 p-3 h-[36vh] overflow-y-scroll rounded-xl">
-              {post.comments.map((comment) => (
+              
+              {postComments?.map((comment) => (
                 <div
                   key={comment._id}
                   className="bg-gray-50 p-3 sm:p-4 rounded-lg"
@@ -290,7 +318,7 @@ const BlogDetail = () => {
 
         {/* otherPostsByThisAuthor */}
         <div className="lg:col-span-2 h-[60vh]">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6"> 
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
             {/* NOTE: sm: means in laptops and normal means in mobiles */}
             More posts by {post?.author?.name}
           </h2>
