@@ -83,7 +83,7 @@ const Navbar = () => {
   }, [isLoggedIn, userData]);
 
   return (
-    <nav className="bg-white shadow-xl w-full z-50  p-4 border border-gray-200 rounded-md">
+    <nav className="bg-white shadow-xl w-full z-30  p-4 border border-gray-200 rounded-md">
       {/* style={{ height: "75px" }} h-[75px] -> Isko hataya then only, wo bottom extra margin wala error resolve hua. */}
       <div className=" mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">

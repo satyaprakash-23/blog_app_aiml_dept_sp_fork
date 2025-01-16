@@ -15,8 +15,10 @@ import CommentEditor from "./CommentEditor";
 import formatDateTime from "../utils/formatDateTime";
 import BlogCard from "./BlogCard";
 import AddComment from "../utils/AddComment";
+import { useNotification } from "../utils/NotificationProvider";
 
 const BlogDetail = () => {
+  const { showNotification } = useNotification();
   const commentEditorRef = useRef(null);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -64,10 +66,12 @@ const BlogDetail = () => {
         console.log("likeDislike Button message: ", jsonResponse.message);
         setLikes((prev) => prev + 1);
         setIsPostLikedByThisUser((prev) => !prev);
+        showNotification("success", "Post liked!");
       } else {
         console.log("likeDislike Button message: ", jsonResponse.message);
         setLikes((prev) => prev - 1);
         setIsPostLikedByThisUser((prev) => !prev);
+        showNotification("success", "Post disliked!");
       }
     }
     likeDislikeApi();
@@ -89,7 +93,7 @@ const BlogDetail = () => {
   useEffect(() => {
     setLikes(post?.likesCount);
     setIsPostLikedByThisUser(postDetail?.isLikedByThisUser);
-    setpostComments(post?.comments);
+    setpostComments(post?.comments.reverse());
   }, [post]);
 
   if (!post) {

@@ -14,6 +14,7 @@ import SignInPage from "./components/SignInPage.js";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import store from "./reduxStateManagementFiles/store.js";
 import { login } from "./reduxStateManagementFiles/authSlice.js";
+import NotificationProvider from "./components/utils/NotificationProvider.js";
 
 const Layout = () => {
   const dispatch = useDispatch();
@@ -46,13 +47,15 @@ const Layout = () => {
     };
     checkSession();
   }, [isLoggedIn, dispatch]);
-  
+
   return (
     <div className="min-h-screen flex flex-col p-4 bg-gray-100">
-      <Navbar />
-      <main className="flex-grow mt-3">
-        <Outlet />
-      </main>
+      <NotificationProvider>
+        <Navbar />
+        <main className="flex-grow mt-3">
+          <Outlet />
+        </main>
+      </NotificationProvider>
     </div>
   );
 };
