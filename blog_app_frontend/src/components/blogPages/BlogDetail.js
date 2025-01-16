@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Heart, MessageCircle, Settings, Sparkles } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Settings,
+  Sparkles,
+  Ellipsis,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import Tooltip from "./Tooltip";
 import usePostDetail from "../utils/usePostDetail";
@@ -34,8 +40,8 @@ const BlogDetail = () => {
     // setPostDetail(usePostDetail(project_id));
     setTimeout(() => {
       window.location.reload();
-    }, 20)
-  };  
+    }, 20);
+  };
 
   useEffect(() => {
     setLikes(post?.likesCount);
@@ -122,7 +128,7 @@ const BlogDetail = () => {
           </Tooltip>
         )}
       </div>
-
+      {/* Post title and author */}
       <div className=" flex flex-col justify-between items-start">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
           {post?.title}
@@ -138,67 +144,26 @@ const BlogDetail = () => {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
+      {/* Main content: poster, summary+contentButton, comments and otherPostsSection */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-2 lg:gap-4 ">
         {/* Cover Image and Interactions */}
-        <div className="lg:col-span-3 space-y-4">
-          <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[450px]">
+        <div className="lg:col-span-3 space-y-4 h-[65vh]">
+          <div className="relative w-full h-full">
             <img
               src={post?.posterUrl}
               alt={post?.title}
               className="w-full h-full object-cover rounded-lg shadow-lg"
             />
           </div>
-          {/* Interaction Buttons */}
-          <div className="flex items-center space-x-4 mt-2 sm:mt-4">
-            <Tooltip message="Login first" show={!isLoggedIn}>
-              <button
-                className={`flex items-center space-x-2 text-rose-500 ${
-                  isLoggedIn
-                    ? "cursor-pointer hover:text-rose-700"
-                    : "cursor-not-allowed text-rose-300"
-                }`}
-                onClick={() => handleLikeButtonClick(post?._id)}
-                disabled={!isLoggedIn}
-              >
-                {isPostLikedByThisUser ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-red-500"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                ) : (
-                  <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
-                )}
-                <span className="text-sm sm:text-base">{likes}</span>
-              </button>
-            </Tooltip>
-            <Tooltip message="Login first" show={!isLoggedIn}>
-              <button
-                className={`flex items-center space-x-2 text-gray-500 ${
-                  isLoggedIn
-                    ? "cursor-pointer hover:text-gray-700"
-                    : "cursor-not-allowed text-gray-300"
-                }`}
-                disabled={!isLoggedIn}
-              >
-                <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span className="text-sm sm:text-base">
-                  {post?.comments?.length}
-                </span>
-              </button>
-            </Tooltip>
-          </div>
         </div>
 
         {/* Summary and Content */}
-        <div className="lg:col-span-2 flex flex-col justify-between space-y-4 sm:space-y-6">
-          <div className="flex flex-col justify-between align-baseline space-y-4">
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg">
+        <div className="lg:col-span-2 h-full pb-1 flex flex-col justify-between items-stretch ">
+          <div>
+            {/* Summary Box div below:- */}
+            <div className="bg-gray-300 p-4 sm:p-6 rounded-lg h-fit">
               <div className="flex justify-between">
-                <div className="h-full flex items-center ">
+                <div className="flex items-center ">
                   <h2 className=" text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
                     Summary
                   </h2>
@@ -212,21 +177,65 @@ const BlogDetail = () => {
                 {post?.summary}
               </p>
             </div>
-            <div className="w-full">
-              <button
-                type="button"
-                className="w-full text-white bg-[#1D4ED8] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 sm:px-5 py-2 sm:py-2.5 text-center inline-flex items-center justify-center"
-                onClick={handleOpenModal}
-              >
-                Read Full Blog Content Here
-              </button>
-              <Modal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                content={post.content}
-                title={post.title}
-              />
+            {/* Interaction Buttons */}
+            <div className="flex items-center space-x-4 mt-2 sm:mt-4">
+              <Tooltip message="Login first" show={!isLoggedIn}>
+                <button
+                  className={`flex items-center space-x-2 text-rose-500 ${
+                    isLoggedIn
+                      ? "cursor-pointer hover:text-rose-700"
+                      : "cursor-not-allowed text-rose-300"
+                  }`}
+                  onClick={() => handleLikeButtonClick(post?._id)}
+                  disabled={!isLoggedIn}
+                >
+                  {isPostLikedByThisUser ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5 sm:w-6 sm:h-6 text-red-500"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                  ) : (
+                    <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
+                  )}
+                  <span className="text-sm sm:text-base">{likes}</span>
+                </button>
+              </Tooltip>
+              <Tooltip message="Login first" show={!isLoggedIn}>
+                <button
+                  className={`flex items-center space-x-2 text-gray-500 ${
+                    isLoggedIn
+                      ? "cursor-pointer hover:text-gray-700"
+                      : "cursor-not-allowed text-gray-300"
+                  }`}
+                  disabled={!isLoggedIn}
+                >
+                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <span className="text-sm sm:text-base">
+                    {post?.comments?.length}
+                  </span>
+                </button>
+              </Tooltip>
             </div>
+          </div>
+          {/* read full content Button div below */}
+          <div className="w-full">
+            <button
+              type="button"
+              className="w-full text-white bg-[#1D4ED8] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 sm:px-5 py-2 sm:py-2.5 text-center inline-flex items-center justify-center"
+              onClick={handleOpenModal}
+            >
+              Read Full Blog Content Here
+            </button>
+            <Modal
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              content={post.content}
+              title={post.title}
+            />
           </div>
         </div>
 
@@ -235,10 +244,12 @@ const BlogDetail = () => {
           <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
             Comments
           </h2>
+
+          {/* Add Comment section */}
           <CommentEditor />
 
           {post.comments.length > 0 ? (
-            <div className="space-y-3 sm:space-y-4 mt-3 bg-slate-200 p-3 h-[34vh] overflow-y-scroll rounded-xl">
+            <div className="space-y-3 sm:space-y-4 mt-3 bg-slate-200 p-3 h-[36vh] overflow-y-scroll rounded-xl">
               {post.comments.map((comment) => (
                 <div
                   key={comment._id}
@@ -263,6 +274,12 @@ const BlogDetail = () => {
                   </p>
                 </div>
               ))}
+              <div className="flex flex-col items-center">
+                {/* <h2 className=" text-slate-700 text-sm font-semibold">
+                  The End!
+                </h2> */}
+                <Ellipsis />
+              </div>
             </div>
           ) : (
             <p className="text-gray-600 text-sm sm:text-base mt-3">
@@ -272,34 +289,36 @@ const BlogDetail = () => {
         </div>
 
         {/* otherPostsByThisAuthor */}
-        <div className="col-span-2 mt-3 bg-slate-200 p-3 h-[70vh]  rounded-xl overflow-y-scroll">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
+        <div className="lg:col-span-2 h-[60vh]">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6"> 
+            {/* NOTE: sm: means in laptops and normal means in mobiles */}
             More posts by {post?.author?.name}
           </h2>
-          {post?.otherPostsByThisPostAuthor.map((indvPost) => {
-            return (
-              <div className="bg-white my-2 rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-150 cursor-default ">
-                <img
-                  src={indvPost.posterUrl}
-                  alt={indvPost.title}
-                  className="w-full h-24 object-cover"
-                />
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
-                  <div className="flex items-center text-gray-600 text-xs mb-2">
-                    <img
-                      src={post?.author?.avatarUrl}
-                      alt={post?.author?.name}
-                      className="w-6 rounded-full mr-2"
-                    />
-                    <span>{post?.author?.name}</span>
-                    <span className="mx-2">•</span>
-                    <span>{formatDateTime(indvPost?.createdAt)}</span>
-                    <span className="mx-2">•</span>
-                    <span>{indvPost?.minutesRead}min read</span>
-                  </div>
-                  <div className="flex items-center text-rose-500 text-sm mb-3">
-                    {/* <span>
+          <div className="h-[57vh] overflow-y-scroll overflow-x-hidden p-4 bg-slate-200 rounded-xl">
+            {post?.otherPostsByThisPostAuthor.map((indvPost) => {
+              return (
+                <div className="bg-white my-2 rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-150 cursor-default ">
+                  <img
+                    src={indvPost.posterUrl}
+                    alt={indvPost.title}
+                    className="w-full h-24 object-cover"
+                  />
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
+                    <div className="flex items-center text-gray-600 text-xs mb-2">
+                      <img
+                        src={post?.author?.avatarUrl}
+                        alt={post?.author?.name}
+                        className="w-6 rounded-full mr-2"
+                      />
+                      <span>{post?.author?.name}</span>
+                      <span className="mx-2">•</span>
+                      <span>{formatDateTime(indvPost?.createdAt)}</span>
+                      <span className="mx-2">•</span>
+                      <span>{indvPost?.minutesRead}min read</span>
+                    </div>
+                    <div className="flex items-center text-rose-500 text-sm mb-3">
+                      {/* <span>
                     {post?.likesCount > 0 ? (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -314,29 +333,36 @@ const BlogDetail = () => {
                     )}{" "}
                   </span> */}
 
-                    {/* <span>
+                      {/* <span>
                     {" "}
                     {post.likesCount > 1
                       ? ` ${post?.likesCount} appreciations`
                       : ` ${post?.likesCount} appreciation`}{" "}
                   </span> */}
+                    </div>
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {indvPost.description}
+                    </p>
+                    <button
+                      className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardClick(indvPost._id);
+                      }}
+                    >
+                      Read More →
+                    </button>
                   </div>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {indvPost.description}
-                  </p>
-                  <button
-                    className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCardClick(indvPost._id);
-                    }}
-                  >
-                    Read More →
-                  </button>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+            <div className="flex flex-col items-center">
+              {/* <h2 className=" text-slate-700 text-sm font-semibold">
+                The End!
+              </h2> */}
+              <Ellipsis />
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -38,7 +38,7 @@ const Hero = () => {
       setCurrentSlide((prev) => (prev + 1) % 3);
       // console.log("Current Slide (index): ",currentSlide);
       // console.log("3) slides length in useEffect: ", slides.length);
-    }, 3000);
+    }, 6000);
 
     return () => clearInterval(timer);
   }, []);
