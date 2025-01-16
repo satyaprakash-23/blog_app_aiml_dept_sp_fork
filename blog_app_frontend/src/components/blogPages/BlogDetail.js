@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Heart,
@@ -17,9 +17,9 @@ import BlogCard from "./BlogCard";
 import AddComment from "../utils/AddComment";
 
 const BlogDetail = () => {
+  const commentEditorRef = useRef(null);
   const navigate = useNavigate();
   const { id } = useParams();
-  // const [postDetail, setPostDetail] = useState(usePostDetail(id));
   const postDetail = usePostDetail(id);
   const post = postDetail?.queriedPost;
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,11 +43,6 @@ const BlogDetail = () => {
       window.location.reload();
     }, 20);
   };
-
-  useEffect(() => {
-    setLikes(post?.likesCount);
-    setIsPostLikedByThisUser(postDetail?.isLikedByThisUser);
-  }, [post, postDetail]);
 
   const handleLikeButtonClick = async (postId) => {
     async function likeDislikeApi() {
@@ -86,16 +81,27 @@ const BlogDetail = () => {
   
   
   const [postComments,setpostComments] = useState(null);
-  useEffect(()=>{
-    setpostComments(post?.comments)
-  },[post])
 
-  
-  
+  // useEffect(()=>{
+  //   setpostComments(post?.comments)
+  // },[post])
+
+  useEffect(() => {
+    setLikes(post?.likesCount);
+    setIsPostLikedByThisUser(postDetail?.isLikedByThisUser);
+    setpostComments(post?.comments);
+  }, [post]);
 
   if (!post) {
     return <p>Post not found!</p>;
   }
+
+  const handleFocusCommentEditor = () => {
+    console.log("Focusing CommentEditor");
+    if (commentEditorRef.current) {
+      commentEditorRef.current.focus(); // Focus the CommentEditor
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -228,6 +234,7 @@ const BlogDetail = () => {
                       : "cursor-not-allowed text-gray-300"
                   }`}
                   disabled={!isLoggedIn}
+                  onClick={handleFocusCommentEditor}
                 >
                   <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                   <span className="text-sm sm:text-base">
@@ -263,21 +270,17 @@ const BlogDetail = () => {
 
           {/* Add Comment section */}
           <CommentEditor
-          
-        
-            postComments = {postComments}
-            setpostComments = {setpostComments}
+            isLoggedIn={isLoggedIn}
+            ref={commentEditorRef}
+            postComments={postComments}
+            setpostComments={setpostComments}
             sentPostId={post._id}
-            
           />
-
-          
           {console.log("commentResponse")}
           {console.log(apiResponse)}
 
           {post.comments.length > 0 ? (
             <div className="space-y-3 sm:space-y-4 mt-3 bg-slate-200 p-3 h-[36vh] overflow-y-scroll rounded-xl">
-              
               {postComments?.map((comment) => (
                 <div
                   key={comment._id}
@@ -285,20 +288,24 @@ const BlogDetail = () => {
                 >
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <img
-                      src={comment.commentedBy[0].avatarUrl}
-                      alt={post.author.name}
+                      src={
+                        comment?.commentedBy[0]?.avatarUrl ||
+                        comment?.commentedBy?.avatarUrl
+                      }
+                      alt={post?.author?.name}
                       className="w-6 rounded-full "
                     />
                     <span className="font-medium text-sm sm:text-base">
-                      {comment.commentedBy[0].name}
+                      {comment?.commentedBy[0]?.name ||
+                        comment?.commentedBy?.name}
                     </span>
                     <span className="text-gray-400">•</span>
                     <span className="text-gray-600 text-xs sm:text-sm">
-                      {formatDateTime(comment.createdAt)}
+                      {formatDateTime(comment?.createdAt)}
                     </span>
                   </div>
                   <p className="text-gray-700 text-sm sm:text-base">
-                    {comment.comment}
+                    {comment?.comment}
                   </p>
                 </div>
               ))}
@@ -323,16 +330,18 @@ const BlogDetail = () => {
             More posts by {post?.author?.name}
           </h2>
           <div className="h-[57vh] overflow-y-scroll overflow-x-hidden p-4 bg-slate-200 rounded-xl">
-            {post?.otherPostsByThisPostAuthor.map((indvPost) => {
+            {post?.otherPostsByThisPostAuthor?.map((indvPost) => {
               return (
                 <div className="bg-white my-2 rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-150 cursor-default ">
                   <img
-                    src={indvPost.posterUrl}
-                    alt={indvPost.title}
+                    src={indvPost?.posterUrl}
+                    alt={indvPost?.title}
                     className="w-full h-24 object-cover"
                   />
                   <div className="p-4">
-                    <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
+                    <h2 className="text-lg font-semibold mb-2">
+                      {post?.title}
+                    </h2>
                     <div className="flex items-center text-gray-600 text-xs mb-2">
                       <img
                         src={post?.author?.avatarUrl}

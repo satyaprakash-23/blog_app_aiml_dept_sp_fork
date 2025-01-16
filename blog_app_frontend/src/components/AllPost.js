@@ -1,11 +1,8 @@
 import React from "react";
-import { blogPosts } from "./blogPages/blogData";
 import BlogCard from "./blogPages/BlogCard";
 import { useNavigate } from "react-router-dom";
 import useAllPostData from "./utils/useAllPostData";
 import CardsGridDesign from "./utils/CardsGridDesign";
-
-
 
 const AllPost = () => {
   
