@@ -48,7 +48,10 @@ const getPostComments = async (req, res) => {
     }
 
     // Find all comments for the given postId
-    const comments = await Comment.find({ postId });
+    const comments = await Comment.find({ postId }).populate(
+      "commentedBy",
+      "_id name avatarUrl"
+    );
 
     // Return the comments
     return res.status(200).json({
