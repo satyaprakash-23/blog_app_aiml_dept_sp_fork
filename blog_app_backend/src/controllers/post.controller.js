@@ -7,9 +7,12 @@ import { Appreciation } from "../models/appreciation.model.js";
 // Code for a Function to Call the GPT API
 const generatePostMetadata = async (title, description, content) => {
   // 1. Construct the User Prompt
-  const userPrompt = `Blog Title: ${title}\nDescription: ${description}\nContent: ${content}\n\nPlease provide response in JSON format having fields "summary" "minutesRead" and "tags". Just give me the "result" such that, the "result.response.text()" is in this form:- \n 
+  const userPrompt = `Blog Title: ${title}\nDescription: ${description}\nContent: ${content}\n Note that the "content" will be generated through TINY-MCE rich-text editor which produces the content in pure HTML. But it will be given to you after doing "JSON.stringify(tinyMceProducedContent)" So the "content" will be solething like this:- 
+  \n "<p><span style=\"color: #e03e2d;\">Hello</span> <strong>there nsdjfnojdpo jfob onf obnfonfdff</strong></p>\n<p>&nbsp;</p>\n<div>\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry." \n You can use html-react-parser to parse the content.
+  \n Now let's talk about the response you have to give me. \n
+  \n Please provide response in JSON format having fields "summary" "minutesRead" and "tags". Just give me the "result" such that, the "result.response.text()" is in this form:- \n 
   {
-  "summary": "Post's Summary not more than 450 letters.",
+  "summary": "Post's Summary not more than 450 letters. Don't give me the summary in parsed HTML format. Else just give it in simple text form. ",
   "minutesRead": intValue,
   "tags": [
     "tag_1",
@@ -40,8 +43,8 @@ Ofcourse it will be stringified, but I can simply do  JSON.parse() on it to retu
     const result = await chat.sendMessage(userPrompt);
     const response = result.response.text();
     const slicedResponse = response.slice(7, -3);
-    // console.log(result.response);
-    console.log("Tpe of the response: ", typeof slicedResponse);
+    console.log(result.response);
+    console.log("Type of the response: ", typeof slicedResponse);
     // console.log("Actual response: ", response);
 
     const jsonResponse = JSON.parse(slicedResponse); // Parse the stringified JSON
@@ -60,7 +63,7 @@ Ofcourse it will be stringified, but I can simply do  JSON.parse() on it to retu
 
 const createPost = async (req, res) => {
   try {
-    const { title, description, posterUrl, content } = req.body;
+    const { title, description, content } = req.body;
 
     // Step 1: Get the author from req.user (injected by middleware)
     const author = req.user._id;
@@ -70,11 +73,10 @@ const createPost = async (req, res) => {
     }
 
     if (
-      [title, description, posterUrl, content].some(
+      [title, description, content].some(
         (field) =>
           field?.trim() === "" ||
-          field?.trim() === null ||
-          field?.trim() === undefined
+          field?.trim() === null 
       )
     ) {
       return res.status(400).json({ error: "All fields are required!" });
@@ -98,35 +100,33 @@ const createPost = async (req, res) => {
       );
     }
 
-    // if (
-    //   [summary, minutesRead, tags].some(
-    //     (field) =>
-    //       field?.trim() === "" ||
-    //       field?.trim() === null ||
-    //       field?.trim() === undefined
-    //   )
-    // ) {
-    //   // return res.status(400).json({ error: "Missing responses from LLM" });
-    //   console.log("Missing responses from LLM. Saved without summary, minutesRead and tags.");
-    // }
-
-    // const responseFromTheLLM = await generatePostMetadata(
-    //   title,
-    //   description,
-    //   content
-    // );
-
-    // console.log("Sliced response: ", responseFromTheLLM.slice(7, -3));
-    // const jsonResponse = JSON.parse(responseFromTheLLM.slice(7, -3)); // Parse the JSON string
-    // console.log("Json sliced and parsed response: ",jsonResponse);
-    // const summary = responseFromTheLLM.summary;
-    // const minutesRead = responseFromTheLLM.minutesRead;
-    // const tags = responseFromTheLLM.tags;
-
     // Step 2: Save the content in the Content model
+    console.log("content: ", content);
+    console.log("content type: ", typeof content);
+    
+    
     const newContent = new Content({ postContent: content }); // Assuming `text` is the content field
     const savedContent = await newContent.save();
     const contentId = savedContent._id; // Get the generated content ID
+
+    // get the poster local path.
+    const posterUrlLocalPath = req.file?.path;
+    if (!posterUrlLocalPath) {
+      return res.status(400).json({ error: "Missing poster image" });
+    }
+
+    let posterUrl = "";
+    // I have set the avatar as "not required". So will proceed with the cloudinary service only if posterUrlLocalPath is present with us.
+    if (posterUrlLocalPath) {
+      posterUrl = await uploadOntoCloudinary(posterUrlLocalPath);
+      // Dekho, diya hee nahi agar user ne avatar, fir toh koi baat nahi. But agar diya...
+      // ...and upload karte samay dikkat aa gayi, then we must abort and send error.
+      if (!avatarURL) {
+        return res
+          .status(400)
+          .json({ error: "Error while uploading avatar to cloudinary." });
+      }
+    }
 
     // Step 4: Create the post in the Post model
     const newPost = new Post({

@@ -8,7 +8,7 @@ import Navbar from "./components/headersAndFooters/Navbar.js";
 import Hero from "./components/blogPages/homePostSlider.js";
 import AllPost from "./components/AllPost";
 import MyPosts from "./components/MyPosts";
-import AddPost from "./components/AddPost";
+import AddPost from "./components/AddPost/AddPost.js";
 import BlogDetail from "./components/blogPages/BlogDetail.js";
 import SignInPage from "./components/SignInPage.js";
 import { Provider, useDispatch, useSelector } from "react-redux";

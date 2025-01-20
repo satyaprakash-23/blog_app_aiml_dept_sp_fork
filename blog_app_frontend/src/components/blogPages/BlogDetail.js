@@ -283,7 +283,7 @@ const BlogDetail = () => {
           {console.log("commentResponse")}
           {console.log(apiResponse)}
 
-          {post.comments.length > 0 ? (
+          {postComments?.length > 0 ? (
             <div className="space-y-3 sm:space-y-4 mt-3 bg-slate-200 p-3 h-[36vh] overflow-y-scroll rounded-xl">
               {postComments?.map((comment) => (
                 <div

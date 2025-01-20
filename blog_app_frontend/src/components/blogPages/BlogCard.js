@@ -7,12 +7,12 @@ const BlogCard = ({ post, onClick }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-150 cursor-default">
       <img
-        src={post.posterUrl}
-        alt={post.title}
+        src={post?.posterUrl}
+        alt={post?.title}
         className="w-full h-48 object-cover"
       />
       <div className="p-4">
-        <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
+        <h2 className="text-xl font-semibold mb-2">{post?.title}</h2>
         <div className="flex items-center text-gray-600 text-xs mb-2">
           <img
             src={post?.author?.avatarUrl}
@@ -43,17 +43,17 @@ const BlogCard = ({ post, onClick }) => {
 
           <span>
             {" "}
-            {post.likesCount > 1
+            {post?.likesCount > 1
               ? ` ${post?.likesCount} appreciations`
               : ` ${post?.likesCount} appreciation`}{" "}
           </span>
         </div>
-        <p className="text-gray-600 mb-4 line-clamp-3">{post.description}</p>
+        <p className="text-gray-600 mb-4 line-clamp-3">{post?.description}</p>
         <button
           className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
-            onClick(post._id);
+            onClick(post?._id);
           }}
         >
           Read More →

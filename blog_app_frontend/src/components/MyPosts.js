@@ -5,7 +5,7 @@ const MyPosts = () => {
   console.log(userPosts);
 
   return (
-    <CardsGridsDesign data={userPosts}/>
+    <CardsGridsDesign data={userPosts} pageTitle={"My Posts"}/>
   );
 };
 

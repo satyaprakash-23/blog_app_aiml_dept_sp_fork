@@ -67,6 +67,7 @@ const Navbar = () => {
     } else if (buttonContent === "Sign Out") {
       console.log("User wants to sign out");
       await signOut();
+      navigate("/");
       // console.log("isLoggedIn: ", isLoggedIn);
       // console.log("userData after dispatch(logout()): ", userData);
       // The console.log("isLoggedIn: ", isLoggedIn) and console.log("userData after dispatch(logout()): ", userData) inside the
@@ -126,12 +127,14 @@ const Navbar = () => {
             ) : null}
 
             {isAdmin ? (
-              <a
-                href="#"
-                className="text-gray-700 hover:text-blue-600 transition"
-              >
-                Add Post
-              </a>
+              <Link to="/add-post">
+                <a
+                  href="#"
+                  className="text-gray-700 hover:text-blue-600 transition"
+                >
+                  Add Post
+                </a>
+              </Link>
             ) : null}
 
             <button

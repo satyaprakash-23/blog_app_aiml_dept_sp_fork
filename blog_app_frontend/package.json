@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
+    "@tinymce/tinymce-react": "^5.1.1",
     "cra-template": "1.2.0",
     "html-react-parser": "^5.2.2",
     "lucide-react": "^0.471.0",
@@ -13,6 +14,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.1",
     "react-scripts": "5.0.1",
+    "styled-components": "^6.1.14",
     "web-vitals": "^4.2.4"
   },
   "scripts": {

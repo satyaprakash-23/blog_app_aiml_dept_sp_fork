@@ -1,8 +1,25 @@
 import React, { useState, useEffect } from "react";
+import parse from "html-react-parser";
+
 
 const Modal = ({ isOpen, onClose, content, title }) => {
   const [isVisible, setIsVisible] = useState(false);
 
+  function decodeHTMLFromJSON(escapedText) {
+    return escapedText
+      .replace(/\\u003C/g, "<") // Decode < from \u003C
+      .replace(/\\u003E/g, ">") // Decode > from \u003E
+      .replace(/\\u0026/g, "&") // Decode & from \u0026
+      .replace(/\\u0022/g, '"') // Decode " from \u0022
+      .replace(/\\"/g, '"') // Decode escaped double quotes
+      .replace(/\\'/g, "'") // Decode escaped single quotes
+      .replace(/\\\\/g, "\\") // Decode backslashes
+      .replace(/\\n/g, "<br>"); // Decode newline characters
+      // Pehle ye aaise de rha tha:- .replace(/\\n/g, "\n");  -> I changed it to "<br>"!!
+  }
+
+  // console.log(parse(decodeHTMLFromJSON(content))); // -> Just console this once!!
+  
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => setIsVisible(true), 10); // Trigger animation
@@ -23,7 +40,9 @@ const Modal = ({ isOpen, onClose, content, title }) => {
       {/* Modal container */}
       <div
         className={`bg-black text-white rounded-lg shadow-xl w-11/12 sm:w-2/3 lg:w-1/2 max-h-[80vh] overflow-hidden transform transition-all duration-700 ${
-          isVisible ? "scale-100 translate-y-0 opacity-100" : "scale-90 translate-y-10 opacity-0"
+          isVisible
+            ? "scale-100 translate-y-0 opacity-100"
+            : "scale-90 translate-y-10 opacity-0"
         }`}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
@@ -37,9 +56,10 @@ const Modal = ({ isOpen, onClose, content, title }) => {
             &#10005; {/* Cross Icon */}
           </button>
         </div>
-
         {/* Modal Content */}
-        <div className="p-6 overflow-y-auto max-h-[60vh] text-lg">{content}</div>
+        <div className="p-6 overflow-y-auto max-h-[60vh] text-lg prose">
+          {parse(decodeHTMLFromJSON(content))}
+        </div>
       </div>
     </div>
   );

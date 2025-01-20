@@ -18,7 +18,7 @@ const AllPost = () => {
   
   return (
     <>
-    <CardsGridDesign data={allPostData} />
+    <CardsGridDesign data={allPostData} pageTitle={"All Posts"} />
     </>
     // <>
     // <CardsGridDesign data={allPostData} />
