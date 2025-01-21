@@ -15,6 +15,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import store from "./reduxStateManagementFiles/store.js";
 import { login } from "./reduxStateManagementFiles/authSlice.js";
 import NotificationProvider from "./components/utils/NotificationProvider.js";
+import SignUpPage from "./components/SignUpPage.js";
 
 const Layout = () => {
   const dispatch = useDispatch();
@@ -75,6 +76,7 @@ root.render(
             <Route path="add-post" element={<AddPost />} />
           </Route>
           <Route path="/signin" element={<SignInPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
         </Routes>
       </Router>
     </Provider>

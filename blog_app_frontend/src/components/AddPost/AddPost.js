@@ -38,22 +38,6 @@ const AddPost = () => {
     formData.append("poster", image); // Append the file
 
     try {
-      // const response = await fetch(
-      //   "http://localhost:4800/api/v1/post/createPost",
-      //   {
-      //     method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json", // Indicating the content type is JSON
-        //   },
-      //     body: {
-      //       title: title,
-      //       description: description,
-      //       content: JSON.stringify(content),
-      //       poster: image,
-      //     }, // Sending the data as a JSON string
-      //   }
-      // );
-
       const response = await fetch(
         "http://localhost:4800/api/v1/post/createPost",
         {
