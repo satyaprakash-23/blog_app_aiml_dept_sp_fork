@@ -24,6 +24,7 @@ const BlogDetail = () => {
   const { id } = useParams();
   const postDetail = usePostDetail(id);
   const post = postDetail?.queriedPost;
+  console.log(post);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => setIsModalOpen(true);
@@ -82,9 +83,8 @@ const BlogDetail = () => {
   //   postId: "678382fff7228de2bbde8294",
   //   comment: "SpaceX 101",
   // };
-  
-  
-  const [postComments,setpostComments] = useState(null);
+
+  const [postComments, setpostComments] = useState(null);
 
   // useEffect(()=>{
   //   setpostComments(post?.comments)
@@ -182,15 +182,15 @@ const BlogDetail = () => {
             />
           </div>
         </div>
-
-        {/* Summary and Content */}
-        <div className="lg:col-span-2 h-full pb-1 flex flex-col justify-between items-stretch ">
-          <div>
-            {/* Summary Box div below:- */}
-            <div className="bg-gray-300 p-4 sm:p-6 rounded-lg h-fit">
+        {/* summary / content / likes / tags */}
+        <div className="lg:col-span-2 flex flex-col pb-1 h-[65vh]">
+          {/* Summary Section (60%) */}
+          <div className="flex-grow-[7] flex flex-col">
+            {/* Scrollable Summary Content */}
+            <div className="bg-gray-300 p-4 sm:p-6 rounded-lg h-0 flex-grow overflow-y-auto">
               <div className="flex justify-between">
-                <div className="flex items-center ">
-                  <h2 className=" text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
+                <div className="flex items-center">
+                  <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
                     Summary
                   </h2>
                 </div>
@@ -204,7 +204,7 @@ const BlogDetail = () => {
               </p>
             </div>
             {/* Interaction Buttons */}
-            <div className="flex items-center space-x-4 mt-2 sm:mt-4">
+            <div className="flex items-center space-x-4 mt-2 sm:mt-2 mb-2 p-1">
               <Tooltip message="Login first" show={!isLoggedIn}>
                 <button
                   className={`flex items-center space-x-2 text-rose-500 ${
@@ -248,21 +248,49 @@ const BlogDetail = () => {
               </Tooltip>
             </div>
           </div>
-          {/* read full content Button div below */}
-          <div className="w-full">
-            <button
-              type="button"
-              className="w-full text-white bg-[#1D4ED8] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 sm:px-5 py-2 sm:py-2.5 text-center inline-flex items-center justify-center"
-              onClick={handleOpenModal}
-            >
-              Read Full Blog Content Here
-            </button>
-            <Modal
-              isOpen={isModalOpen}
-              onClose={handleCloseModal}
-              content={post.content}
-              title={post.title}
-            />
+
+          {/* Tags Section (40%) */}
+          <div className="flex-grow-[3] flex flex-col">
+            {/* Scrollable Tags Content */}
+            <div className="bg-gray-300 p-4 sm:p-6 rounded-lg h-0 flex-grow overflow-y-auto">
+              <div className="flex justify-between">
+                <div className="flex items-center">
+                  <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
+                    Tags
+                  </h2>
+                </div>
+                <div className="flex items-start">
+                  <Sparkles width={16} />
+                  <h2 className="text-xs relative top-1">AI generated</h2>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-gray-200 text-gray-700 text-sm px-2 py-1 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {/* Read More Button */}
+            <div className="w-full mt-2">
+              <button
+                type="button"
+                className="w-full text-white bg-[#1D4ED8] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 sm:px-5 py-2 sm:py-2.5 text-center inline-flex items-center justify-center"
+                onClick={handleOpenModal}
+              >
+                Read Full Blog Content Here
+              </button>
+              <Modal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                content={post.content}
+                title={post.title}
+              />
+            </div>
           </div>
         </div>
 
