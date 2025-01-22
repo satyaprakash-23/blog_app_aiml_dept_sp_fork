@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 
 import Navbar from "./components/headersAndFooters/Navbar.js";
-import Hero from "./components/blogPages/homePostSlider.js";
+import Home from "./components/Home.js";
 import AllPost from "./components/AllPost";
 import MyPosts from "./components/MyPosts";
 import AddPost from "./components/AddPost/AddPost.js";
@@ -71,14 +71,13 @@ root.render(
       <Router>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Hero />} />
+            <Route index element={<Home />} />
             <Route path="all-posts" element={<AllPost />} />
             <Route path="all-posts/:id" element={<BlogDetail />} />{" "}
             {/* Corrected path */}
             <Route path="my-posts" element={<MyPosts />} />
             <Route path="add-post" element={<AddPost />} />
             <Route path="about" element={<About />} />
-
           </Route>
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />

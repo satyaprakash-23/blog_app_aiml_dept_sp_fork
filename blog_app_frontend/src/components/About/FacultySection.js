@@ -39,8 +39,8 @@ const FacultySection = () => {
                 className="w-48 h-48 rounded-full object-cover shadow-lg mb-4"
               />
               <h3 className="text-xl font-semibold">{faculty.name}</h3>
-              <p className="text-blue-600 mb-2">{faculty.title}</p>
-              <p className="text-gray-600 text-center">{faculty.description}</p>
+              <p className="text-blue-600 mb-2 text-center">{faculty.title}</p>
+              {/* <p className="text-gray-600 text-center">{faculty.description}</p> */}
             </div>
           ))}
         </div>

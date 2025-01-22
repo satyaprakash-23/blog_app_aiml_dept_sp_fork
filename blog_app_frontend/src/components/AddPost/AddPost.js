@@ -16,7 +16,7 @@ const AddPost = () => {
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false);
-    }, [2300]);
+    }, [3000]);
   }, []);
 
   const publishBlog = async (e) => {
@@ -71,7 +71,6 @@ const AddPost = () => {
     }
   }
 //   NOTE: TODO: I need to setup multer for image upload in the backend and then send the image as a formdata object.
-
 
   return (
     <div>

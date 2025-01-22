@@ -1,16 +1,24 @@
 import React, { useEffect } from "react";
 import { Menu, X, BookOpen } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import maitLogo from "../../assets/mait_logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../reduxStateManagementFiles/authSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
-
   const userData = useSelector((state) => state.auth.userData);
   const isAdmin = userData?.isAdmin;
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
+  // const urlParameter = useParams();
+  // console.log("Url parameter", urlParameter);
+
+  const location = useLocation();
+  const currentPath = location.pathname;
+  // console.log("path: ", location.pathname);
+  
+  
 
   // const [isLoggedIn, setIsLoggedIn] = React.useState(isLoggedInFromStore);
   // const [userData, setUserData] = React.useState(userDataFromStore);
@@ -101,7 +109,11 @@ const Navbar = () => {
             <Link to="/">
               <a
                 href="#"
-                className="text-gray-700 hover:text-blue-600 transition"
+                className={
+                  currentPath === "/"
+                    ? "text-primary-600 font-bold hover:text-blue-600 transition "
+                    : "text-gray-700 hover:text-blue-600 transition"
+                }
               >
                 Home
               </a>
@@ -109,7 +121,11 @@ const Navbar = () => {
             <Link to="/all-posts">
               <a
                 href="#"
-                className="text-gray-700 hover:text-blue-600 transition"
+                className={
+                  currentPath === "/all-posts"
+                    ? "text-primary-600 font-bold hover:text-blue-600 transition "
+                    : "text-gray-700 hover:text-blue-600 transition"
+                }
               >
                 All Posts
               </a>
@@ -119,7 +135,11 @@ const Navbar = () => {
               <Link to="/my-posts">
                 <a
                   href="#"
-                  className="text-gray-700 hover:text-blue-600 transition"
+                  className={
+                    currentPath === "/my-posts"
+                      ? "text-primary-600 font-bold hover:text-blue-600 transition "
+                      : "text-gray-700 hover:text-blue-600 transition"
+                  }
                 >
                   My Posts
                 </a>
@@ -130,7 +150,11 @@ const Navbar = () => {
               <Link to="/add-post">
                 <a
                   href="#"
-                  className="text-gray-700 hover:text-blue-600 transition"
+                  className={
+                    currentPath === "/add-post"
+                      ? "text-primary-600 font-bold hover:text-blue-600 transition "
+                      : "text-gray-700 hover:text-blue-600 transition"
+                  }
                 >
                   Add Post
                 </a>
@@ -140,7 +164,11 @@ const Navbar = () => {
             <Link to="/about">
               <a
                 href="#"
-                className="text-gray-700 hover:text-blue-600 transition"
+                className={
+                  currentPath === "/about"
+                    ? "text-primary-600 font-bold hover:text-blue-600 transition "
+                    : "text-gray-700 hover:text-blue-600 transition"
+                }
               >
                 About
               </a>
