@@ -17,6 +17,7 @@ import { login } from "./reduxStateManagementFiles/authSlice.js";
 import NotificationProvider from "./components/utils/NotificationProvider.js";
 import About from "./components/About/About.js";
 import Footer from "./components/About/Footer.js";
+import SignUpPage from "./components/SignUpPage.js";
 
 const Layout = () => {
   const dispatch = useDispatch();
@@ -80,6 +81,7 @@ root.render(
 
           </Route>
           <Route path="/signin" element={<SignInPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
         </Routes>
       </Router>
     </Provider>

@@ -10,18 +10,12 @@ const DescriptionTitleImageForms = ({
     setImage(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission
-    // console.log({ title, description, image });
-  };
-
   return (
     <div className="w-[30vw] h-full mx-auto bg-white shadow-md rounded-xl p-6">
       <h1 className="text-2xl font-semibold text-gray-800 mb-6">
         Create a New Blog Post
       </h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form className="space-y-6">
         {/* Title */}
         <div>
           <label
