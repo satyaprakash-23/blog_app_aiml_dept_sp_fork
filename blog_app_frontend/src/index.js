@@ -15,6 +15,8 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import store from "./reduxStateManagementFiles/store.js";
 import { login } from "./reduxStateManagementFiles/authSlice.js";
 import NotificationProvider from "./components/utils/NotificationProvider.js";
+import About from "./components/About/About.js";
+import Footer from "./components/About/Footer.js";
 
 const Layout = () => {
   const dispatch = useDispatch();
@@ -55,6 +57,7 @@ const Layout = () => {
         <main className="flex-grow mt-3">
           <Outlet />
         </main>
+        <Footer />
       </NotificationProvider>
     </div>
   );
@@ -73,6 +76,8 @@ root.render(
             {/* Corrected path */}
             <Route path="my-posts" element={<MyPosts />} />
             <Route path="add-post" element={<AddPost />} />
+            <Route path="about" element={<About />} />
+
           </Route>
           <Route path="/signin" element={<SignInPage />} />
         </Routes>
