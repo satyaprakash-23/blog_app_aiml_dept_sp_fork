@@ -3,6 +3,8 @@ import RTE from "./RTE.js";
 import DescriptionTitleImageForms from "./DescriptionTitleImageForms.js";
 import Loader from "./Loader.js";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../utils/NotificationProvider.js";
+import PublisingLoader from "./LoaderForPublishing.js";
 
 const AddPost = () => {
   const [content, setContent] = useState("");
@@ -10,6 +12,9 @@ const AddPost = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  const { showNotification } = useNotification();
 
   const navigate = useNavigate();
 
@@ -21,12 +26,27 @@ const AddPost = () => {
 
   const publishBlog = async (e) => {
     e.preventDefault();
+    setIsPublishing(true);
     console.log(JSON.stringify(content));
 
-    if (!image) {
-      alert("Please select an image!");
-      return;
+    if (
+      [content, title, description, image].some(
+        (field) =>
+          field === "" ||
+          field === null ||
+          field === undefined
+      )
+    ) {
+        setIsPublishing(false);
+        showNotification("error", "All fields are required!");
+        return;
     }
+
+    //   if (!image) {
+    //     setIsLoading(false);
+    //     showNotification("error", "Please select an image!");
+    //     return;
+    //   }
 
     // setIsLoading(true);
 
@@ -64,42 +84,58 @@ const AddPost = () => {
         setTitle("");
         setDescription("");
         setImage(null);
+        setIsPublishing(false);
+        showNotification("success", "Your blog is published successfully!");
         navigate(`/all-posts/${result.post?._id}`);
       }
     } catch (error) {
-      console.log("Failed to create post:", error);
+        showNotification("error", "Failed to publish blog!");
+        setIsPublishing(false);
+        console.log("Failed to create post:", error);
     }
   }
 //   NOTE: TODO: I need to setup multer for image upload in the backend and then send the image as a formdata object.
 
-  return (
-    <div>
-      <div
-        className={
-          isLoading
-            ? "h-[80vh] w-screen flex justify-center items-center"
-            : "hidden"
-        }
-      >
-        <Loader />
+  if (isPublishing) {
+    return (
+      <div className="h-[80vh] w-screen flex justify-center items-center">
+        <PublisingLoader />
       </div>
-      <div
-        className={isLoading ? "hidden" : "flex justify-center w-full h-[80vh]"}
-      >
-        <div className="mx-2">
-          <RTE setContent={setContent} />
+    ); 
+  } 
+  else {
+
+      return (
+        <div>
+          <div
+            className={
+              isLoading
+                ? "h-[80vh] w-screen flex justify-center items-center"
+                : "hidden"
+            }
+          >
+            <Loader />
+          </div>
+          <div
+            className={
+              isLoading ? "hidden" : "flex justify-center w-full h-[80vh]"
+            }
+          >
+            <div className="mx-2">
+              <RTE setContent={setContent} />
+            </div>
+            <div className="mx-2">
+              <DescriptionTitleImageForms
+                setDescription={setDescription}
+                setImage={setImage}
+                setTitle={setTitle}
+                publishBlog={publishBlog}
+              />
+            </div>
+          </div>
         </div>
-        <div className="mx-2">
-          <DescriptionTitleImageForms
-            setDescription={setDescription}
-            setImage={setImage}
-            setTitle={setTitle}
-            publishBlog={publishBlog}
-          />
-        </div>
-      </div>
-    </div>
-  );
+      );
+  }
 };
 
 export default AddPost;
