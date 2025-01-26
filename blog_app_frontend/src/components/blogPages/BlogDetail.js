@@ -17,6 +17,7 @@ import BlogCard from "./BlogCard";
 import AddComment from "../utils/AddComment";
 import { useNotification } from "../utils/NotificationProvider";
 import Loader from "../GlobalLoader";
+// import { motion, AnimatePresence } from "framer-motion";
 
 const BlogDetail = () => {
   const { showNotification } = useNotification();
@@ -119,8 +120,32 @@ const BlogDetail = () => {
     }
   };
 
+  //setting button
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const buttonRef = useRef(null);
+  const [buttonPosition, setButtonPosition] = useState({ top: 0, right: 0 });
+  useEffect(() => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setButtonPosition({
+        top: rect.bottom, // Positioning dropdown below the button
+        right: rect.right,
+      });
+    }
+  }, []);
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
+  const handleEdit = () => {
+    console.log("Edit clicked");
+  };
+
+  const handleDelete = () => {
+    console.log("Delete clicked");
+  };
+
   // console.log(post);
-  
 
   return (
     <div>
@@ -148,16 +173,50 @@ const BlogDetail = () => {
             </button>
             {isLoggedIn ? (
               userData?._id === post?.author?._id ? (
-                <button
-                  className={`text-gray-600 ${
-                    userData?.isAdmin
-                      ? "cursor-pointer hover:text-gray-900"
-                      : "cursor-not-allowed"
-                  }`}
-                  // disabled={!userData?.isAdmin}
-                >
-                  <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
+                <div className="relative">
+                  {/* Settings Button */}
+                  <button
+                    ref={buttonRef}
+                    className={`text-gray-600 ${
+                      userData?.isAdmin
+                        ? "cursor-pointer hover:text-gray-900"
+                        : "cursor-not-allowed"
+                    }`}
+                    onClick={userData?.isAdmin ? toggleDropdown : undefined}
+                  >
+                    <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  <div
+                    className={`absolute transition-all duration-500 ease-in-out transform  ${
+                      dropdownOpen
+                        ? "opacity-100 scale-100 translate-y-0"
+                        : "opacity-0 scale-95 translate-y-2 pointer-events-none"
+                    }`}
+                    style={{
+                      top: `${buttonPosition.top + 25}px`, // Add some space below the button
+                      right: `${buttonPosition.right }px`, // Align dropdown to the left of the button
+                    }}
+                  >
+                    <ul className="w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
+                      {/* Edit Option */}
+                      <li
+                        className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
+                        onClick={handleEdit}
+                      >
+                        Edit
+                      </li>
+                      {/* Delete Option */}
+                      <li
+                        className="px-4 py-2 text-red-600 cursor-pointer hover:bg-red-100"
+                        onClick={handleDelete}
+                      >
+                        Delete
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               ) : (
                 <Tooltip message="Not the author" show={true}>
                   <button
