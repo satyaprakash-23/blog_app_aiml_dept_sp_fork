@@ -17,6 +17,7 @@ import BlogCard from "./BlogCard";
 import AddComment from "../utils/AddComment";
 import { useNotification } from "../utils/NotificationProvider";
 import Loader from "../GlobalLoader";
+import DeletionModal from "./DeletionWarning";
 // import { motion, AnimatePresence } from "framer-motion";
 
 const BlogDetail = () => {
@@ -134,18 +135,33 @@ const BlogDetail = () => {
     }
   }, []);
 
+
+
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
   };
   const handleEdit = () => {
     console.log("Edit clicked");
   };
+  const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
+  const handleOpenDeletionModal = () => setIsDeletionModalOpen(true);
+  const handleCloseDeletionModal = () => setIsDeletionModalOpen(false);
+  // const handleDelete = () => {
+  //   console.log("Delete clicked");
 
-  const handleDelete = () => {
-    console.log("Delete clicked");
-  };
+  // };
 
   // console.log(post);
+
+  // NOTE: Many a times, tailwind does not react to react's states like this :-  className={isDeletionModalOpen ? "overflow-y-hidden" : ""}...
+  // ...Hence, we need to apply the property using conventional CSS styling only!
+  useEffect(() => {
+  if (isDeletionModalOpen || isModalOpen) {
+    document.body.classList.add("overflow-hidden");
+  } else {
+    document.body.classList.remove("overflow-hidden");
+  }
+}, [isDeletionModalOpen, isModalOpen]);
 
   return (
     <div>
@@ -162,7 +178,15 @@ const BlogDetail = () => {
       <div
         className={isLoading ? "hidden" : "flex justify-center w-full h-full"}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 ">
+        <DeletionModal
+          isOpen={isDeletionModalOpen}
+          onClose={handleCloseDeletionModal}
+          authorName={post?.author?.name}
+          postName={post?.title}
+          likesCount = {post?.likesCount}
+          commentLength = {post?.comments?.length}
+        />
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 `}>
           {/* Header */}
           <div className="flex justify-between items-center mb-4 sm:mb-6 lg:mb-8">
             <button
@@ -196,7 +220,7 @@ const BlogDetail = () => {
                     }`}
                     style={{
                       top: `${buttonPosition.top + 25}px`, // Add some space below the button
-                      right: `${buttonPosition.right }px`, // Align dropdown to the left of the button
+                      right: `${buttonPosition.right}px`, // Align dropdown to the left of the button
                     }}
                   >
                     <ul className="w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
@@ -210,7 +234,7 @@ const BlogDetail = () => {
                       {/* Delete Option */}
                       <li
                         className="px-4 py-2 text-red-600 cursor-pointer hover:bg-red-100"
-                        onClick={handleDelete}
+                        onClick={handleOpenDeletionModal}
                       >
                         Delete
                       </li>
