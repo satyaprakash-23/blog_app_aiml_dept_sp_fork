@@ -16,6 +16,7 @@ import formatDateTime from "../utils/formatDateTime";
 import BlogCard from "./BlogCard";
 import AddComment from "../utils/AddComment";
 import { useNotification } from "../utils/NotificationProvider";
+import Loader from "../GlobalLoader";
 
 const BlogDetail = () => {
   const { showNotification } = useNotification();
@@ -23,6 +24,17 @@ const BlogDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const postDetail = usePostDetail(id);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Loader Logic
+  useEffect(() => {
+    if (postDetail) {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+    }
+  }, [postDetail]);
+
   const post = postDetail?.queriedPost;
   console.log(post);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -77,8 +89,7 @@ const BlogDetail = () => {
     }
     likeDislikeApi();
   };
-  //comment useState
-  const [apiResponse, setApiResponse] = useState(null);
+
   // const requestData = {
   //   postId: "678382fff7228de2bbde8294",
   //   comment: "SpaceX 101",
@@ -91,14 +102,15 @@ const BlogDetail = () => {
   // },[post])
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     setLikes(post?.likesCount);
     setIsPostLikedByThisUser(postDetail?.isLikedByThisUser);
     setpostComments(post?.comments.reverse());
   }, [post]);
 
-  if (!post) {
-    return <p>Post not found!</p>;
-  }
+  // if (!post) {
+  //   return <p>Post not found!</p>;
+  // }
 
   const handleFocusCommentEditor = () => {
     console.log("Focusing CommentEditor");
@@ -107,287 +119,313 @@ const BlogDetail = () => {
     }
   };
 
+  // console.log(post);
+  
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4 sm:mb-6 lg:mb-8">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-gray-600 hover:text-gray-900"
-        >
-          ← Back
-        </button>
-        {isLoggedIn ? (
-          userData._id === post.author._id ? (
-            <button
-              className={`text-gray-600 ${
-                userData?.isAdmin
-                  ? "cursor-pointer hover:text-gray-900"
-                  : "cursor-not-allowed"
-              }`}
-              // disabled={!userData?.isAdmin}
-            >
-              <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-          ) : (
-            <Tooltip message="Not the author" show={true}>
-              <button
-                className={`text-gray-600 cursor-not-allowed`}
-                disabled={true}
-              >
-                <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-            </Tooltip>
-          )
-        ) : (
-          <Tooltip message="Login first" show={!userData?.isAdmin}>
-            <button
-              className={`text-gray-600 ${
-                userData?.isAdmin
-                  ? "cursor-pointer hover:text-gray-900"
-                  : "cursor-not-allowed"
-              }`}
-              disabled={!userData?.isAdmin}
-            >
-              <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-          </Tooltip>
-        )}
+    <div>
+      <div
+        className={
+          isLoading
+            ? "h-[80vh] w-screen flex justify-center items-center"
+            : "hidden"
+        }
+      >
+        <Loader />
       </div>
-      {/* Post title and author */}
-      <div className=" flex flex-col justify-between items-start">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
-          {post?.title}
-        </h1>
-        <h1 className=" flex items-center my-2">
-          <span className="opacity-60 mr-1">Author:</span>
-          {/* <img
+
+      <div
+        className={isLoading ? "hidden" : "flex justify-center w-full h-full"}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 ">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-4 sm:mb-6 lg:mb-8">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ← Back
+            </button>
+            {isLoggedIn ? (
+              userData?._id === post?.author?._id ? (
+                <button
+                  className={`text-gray-600 ${
+                    userData?.isAdmin
+                      ? "cursor-pointer hover:text-gray-900"
+                      : "cursor-not-allowed"
+                  }`}
+                  // disabled={!userData?.isAdmin}
+                >
+                  <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              ) : (
+                <Tooltip message="Not the author" show={true}>
+                  <button
+                    className={`text-gray-600 cursor-not-allowed`}
+                    disabled={true}
+                  >
+                    <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                </Tooltip>
+              )
+            ) : (
+              <Tooltip message="Login first" show={!userData?.isAdmin}>
+                <button
+                  className={`text-gray-600 ${
+                    userData?.isAdmin
+                      ? "cursor-pointer hover:text-gray-900"
+                      : "cursor-not-allowed"
+                  }`}
+                  disabled={!userData?.isAdmin}
+                >
+                  <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              </Tooltip>
+            )}
+          </div>
+          {/* Post title and author */}
+          <div className=" flex flex-col justify-between items-start">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+              {post?.title}
+            </h1>
+            <h1 className=" flex items-center my-2">
+              <span className="opacity-60 mr-1">Author:</span>
+              {/* <img
             src={post?.author?.avatarUrl}
             alt={post?.title}
             className="w-10 h-10 object-cover rounded-full shadow-lg mx-2"
           />{" "} */}
-          <span className=" font-medium">{post?.author?.name}</span>
-        </h1>
-      </div>
-
-      {/* Main content: poster, summary+contentButton, comments and otherPostsSection */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-2 lg:gap-4 ">
-        {/* Cover Image and Interactions */}
-        <div className="lg:col-span-3 space-y-4 h-[65vh]">
-          <div className="relative w-full h-full">
-            <img
-              src={post?.posterUrl}
-              alt={post?.title}
-              className="w-full h-full object-cover rounded-lg shadow-lg"
-            />
-          </div>
-        </div>
-        {/* summary / content / likes / tags */}
-        <div className="lg:col-span-2 flex flex-col pb-1 h-[65vh]">
-          {/* Summary Section (60%) */}
-          <div className="flex-grow-[7] flex flex-col">
-            {/* Scrollable Summary Content */}
-            <div className="bg-gray-300 p-4 sm:p-6 rounded-lg h-0 flex-grow overflow-y-auto">
-              <div className="flex justify-between">
-                <div className="flex items-center">
-                  <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
-                    Summary
-                  </h2>
-                </div>
-                <div className="flex items-start">
-                  <Sparkles width={16} />
-                  <h2 className="text-xs relative top-1">AI generated</h2>
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm sm:text-base">
-                {post?.summary}
-              </p>
-            </div>
-            {/* Interaction Buttons */}
-            <div className="flex items-center space-x-4 mt-2 sm:mt-2 mb-2 p-1">
-              <Tooltip message="Login first" show={!isLoggedIn}>
-                <button
-                  className={`flex items-center space-x-2 text-rose-500 ${
-                    isLoggedIn
-                      ? "cursor-pointer hover:text-rose-700"
-                      : "cursor-not-allowed text-rose-300"
-                  }`}
-                  onClick={() => handleLikeButtonClick(post?._id)}
-                  disabled={!isLoggedIn}
-                >
-                  {isPostLikedByThisUser ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5 sm:w-6 sm:h-6 text-red-500"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                    </svg>
-                  ) : (
-                    <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
-                  )}
-                  <span className="text-sm sm:text-base">{likes}</span>
-                </button>
-              </Tooltip>
-              <Tooltip message="Login first" show={!isLoggedIn}>
-                <button
-                  className={`flex items-center space-x-2 text-gray-500 ${
-                    isLoggedIn
-                      ? "cursor-pointer hover:text-gray-700"
-                      : "cursor-not-allowed text-gray-300"
-                  }`}
-                  disabled={!isLoggedIn}
-                  onClick={handleFocusCommentEditor}
-                >
-                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
-                  <span className="text-sm sm:text-base">
-                    {post?.comments?.length}
-                  </span>
-                </button>
-              </Tooltip>
-            </div>
+              <span className=" font-medium">{post?.author?.name}</span>
+            </h1>
           </div>
 
-          {/* Tags Section (40%) */}
-          <div className="flex-grow-[3] flex flex-col">
-            {/* Scrollable Tags Content */}
-            <div className="bg-gray-300 p-4 sm:p-6 rounded-lg h-0 flex-grow overflow-y-auto">
-              <div className="flex justify-between">
-                <div className="flex items-center">
-                  <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
-                    Tags
-                  </h2>
-                </div>
-                <div className="flex items-start">
-                  <Sparkles width={16} />
-                  <h2 className="text-xs relative top-1">AI generated</h2>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="bg-gray-200 text-gray-700 text-sm px-2 py-1 rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
+          {/* Main content: poster, summary+contentButton, comments and otherPostsSection */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-2 lg:gap-4 ">
+            {/* Cover Image and Interactions */}
+            <div className="lg:col-span-3 space-y-4 h-[65vh]">
+              <div className="relative w-full h-full">
+                <img
+                  src={post?.posterUrl}
+                  alt={post?.title}
+                  className="w-full h-full object-cover rounded-lg shadow-lg"
+                />
               </div>
             </div>
-            {/* Read More Button */}
-            <div className="w-full mt-2">
-              <button
-                type="button"
-                className="w-full text-white bg-[#1D4ED8] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 sm:px-5 py-2 sm:py-2.5 text-center inline-flex items-center justify-center"
-                onClick={handleOpenModal}
-              >
-                Read Full Blog Content Here
-              </button>
-              <Modal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                content={post.content}
-                title={post.title}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Comments Section */}
-        <div className="lg:col-span-3 h-[60vh]">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
-            Comments
-          </h2>
-
-          {/* Add Comment section */}
-          <CommentEditor
-            isLoggedIn={isLoggedIn}
-            ref={commentEditorRef}
-            postComments={postComments}
-            setpostComments={setpostComments}
-            sentPostId={post._id}
-          />
-          {console.log("commentResponse")}
-          {console.log(apiResponse)}
-
-          {postComments?.length > 0 ? (
-            <div className="space-y-3 sm:space-y-4 mt-3 bg-slate-200 p-3 h-[36vh] overflow-y-scroll rounded-xl">
-              {postComments?.map((comment) => (
-                <div
-                  key={comment._id}
-                  className="bg-gray-50 p-3 sm:p-4 rounded-lg"
-                >
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <img
-                      src={
-                        comment?.commentedBy[0]?.avatarUrl ||
-                        comment?.commentedBy?.avatarUrl
-                      }
-                      alt={post?.author?.name}
-                      className="w-6 rounded-full "
-                    />
-                    <span className="font-medium text-sm sm:text-base">
-                      {comment?.commentedBy[0]?.name ||
-                        comment?.commentedBy?.name}
-                    </span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-600 text-xs sm:text-sm">
-                      {formatDateTime(comment?.createdAt)}
-                    </span>
+            {/* summary / content / likes / tags */}
+            <div className="lg:col-span-2 flex flex-col pb-1 h-[65vh]">
+              {/* Summary Section (60%) */}
+              <div className="flex-grow-[7] flex flex-col">
+                {/* Scrollable Summary Content */}
+                <div className="bg-gray-300 sm:p-3 rounded-lg h-0 flex-grow">
+                  <div className="flex justify-between">
+                    <div className="flex items-center">
+                      <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
+                        Summary
+                      </h2>
+                    </div>
+                    <div className="flex items-start">
+                      <Sparkles width={16} />
+                      <h2 className="text-xs relative top-1">AI generated</h2>
+                    </div>
                   </div>
-                  <p className="text-gray-700 text-sm sm:text-base">
-                    {comment?.comment}
-                  </p>
+                  <div className="h-[25vh] overflow-y-scroll">
+                    <p className="text-gray-600 text-sm sm:text-base">
+                      {post?.summary || "Not available!"}
+                    </p>
+                  </div>
                 </div>
-              ))}
-              <div className="flex flex-col items-center">
-                {/* <h2 className=" text-slate-700 text-sm font-semibold">
+                {/* Interaction Buttons */}
+                <div className="flex items-center space-x-4 mt-2 sm:mt-2 mb-2 p-1">
+                  <Tooltip message="Login first" show={!isLoggedIn}>
+                    <button
+                      className={`flex items-center space-x-2 text-rose-500 ${
+                        isLoggedIn
+                          ? "cursor-pointer hover:text-rose-700"
+                          : "cursor-not-allowed text-rose-300"
+                      }`}
+                      onClick={() => handleLikeButtonClick(post?._id)}
+                      disabled={!isLoggedIn}
+                    >
+                      {isPostLikedByThisUser ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-5 h-5 sm:w-6 sm:h-6 text-red-500"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                        </svg>
+                      ) : (
+                        <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
+                      )}
+                      <span className="text-sm sm:text-base">{likes}</span>
+                    </button>
+                  </Tooltip>
+                  <Tooltip message="Login first" show={!isLoggedIn}>
+                    <button
+                      className={`flex items-center space-x-2 text-gray-500 ${
+                        isLoggedIn
+                          ? "cursor-pointer hover:text-gray-700"
+                          : "cursor-not-allowed text-gray-300"
+                      }`}
+                      disabled={!isLoggedIn}
+                      onClick={handleFocusCommentEditor}
+                    >
+                      <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                      <span className="text-sm sm:text-base">
+                        {post?.comments?.length}
+                      </span>
+                    </button>
+                  </Tooltip>
+                </div>
+              </div>
+
+              {/* Tags Section (40%) */}
+              <div className="flex-grow-[3] flex flex-col">
+                {/* Scrollable Tags Content */}
+                <div className="bg-gray-300 p-3 rounded-lg h-0 flex-grow ">
+                  <div className="flex justify-between">
+                    <div className="flex items-center">
+                      <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
+                        Tags
+                      </h2>
+                    </div>
+                    <div className="flex items-start">
+                      <Sparkles width={16} />
+                      <h2 className="text-xs relative top-1">AI generated</h2>
+                    </div>
+                  </div>
+                  <div className="overflow-y-auto h-[8vh]">
+                    <div className="flex flex-wrap gap-2">
+                      {post?.tags?.length > 0 ? (
+                        post?.tags?.map((tag) => (
+                          <span
+                            key={tag}
+                            className="bg-gray-200 text-gray-700 text-sm px-2 py-1 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))
+                      ) : (
+                        <p className="text-gray-600 text-sm sm:text-base">
+                          Not available!
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* Read More Button */}
+                <div className="w-full mt-2">
+                  <button
+                    type="button"
+                    className="w-full text-white bg-[#1D4ED8] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 sm:px-5 py-2 sm:py-2.5 text-center inline-flex items-center justify-center"
+                    onClick={handleOpenModal}
+                  >
+                    Read Full Blog Content Here
+                  </button>
+                  <Modal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    content={post?.content}
+                    title={post?.title}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Comments Section */}
+            <div className="lg:col-span-3 h-[60vh]">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
+                Comments
+              </h2>
+
+              {/* Add Comment section */}
+              <CommentEditor
+                isLoggedIn={isLoggedIn}
+                ref={commentEditorRef}
+                postComments={postComments}
+                setpostComments={setpostComments}
+                sentPostId={post?._id}
+              />
+              {console.log("commentResponse")}
+
+              {postComments?.length > 0 ? (
+                <div className="space-y-3 sm:space-y-4 mt-3 bg-slate-200 p-3 h-[36vh] overflow-y-scroll rounded-xl">
+                  {postComments?.map((comment) => (
+                    <div
+                      key={comment._id}
+                      className="bg-gray-50 p-3 sm:p-4 rounded-lg"
+                    >
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <img
+                          src={
+                            comment?.commentedBy[0]?.avatarUrl ||
+                            comment?.commentedBy?.avatarUrl
+                          }
+                          alt={post?.author?.name}
+                          className="w-6 rounded-full "
+                        />
+                        <span className="font-medium text-sm sm:text-base">
+                          {comment?.commentedBy[0]?.name ||
+                            comment?.commentedBy?.name}
+                        </span>
+                        <span className="text-gray-400">•</span>
+                        <span className="text-gray-600 text-xs sm:text-sm">
+                          {formatDateTime(comment?.createdAt)}
+                        </span>
+                      </div>
+                      <p className="text-gray-700 text-sm sm:text-base">
+                        {comment?.comment}
+                      </p>
+                    </div>
+                  ))}
+                  <div className="flex flex-col items-center">
+                    {/* <h2 className=" text-slate-700 text-sm font-semibold">
                   The End!
                 </h2> */}
-                <Ellipsis />
-              </div>
+                    <Ellipsis />
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-600 text-sm sm:text-base mt-3">
+                  No comments yet. Be the first to comment!
+                </p>
+              )}
             </div>
-          ) : (
-            <p className="text-gray-600 text-sm sm:text-base mt-3">
-              No comments yet. Be the first to comment!
-            </p>
-          )}
-        </div>
 
-        {/* otherPostsByThisAuthor */}
-        <div className="lg:col-span-2 h-[60vh]">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
-            {/* NOTE: sm: means in laptops and normal means in mobiles */}
-            More posts by {post?.author?.name}
-          </h2>
-          <div className="h-[57vh] overflow-y-scroll overflow-x-hidden p-4 bg-slate-200 rounded-xl">
-            {post?.otherPostsByThisPostAuthor?.map((indvPost) => {
-              return (
-                <div className="bg-white my-2 rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-150 cursor-default ">
-                  <img
-                    src={indvPost?.posterUrl}
-                    alt={indvPost?.title}
-                    className="w-full h-24 object-cover"
-                  />
-                  <div className="p-4">
-                    <h2 className="text-lg font-semibold mb-2">
-                      {post?.title}
-                    </h2>
-                    <div className="flex items-center text-gray-600 text-xs mb-2">
+            {/* otherPostsByThisAuthor */}
+            <div className="lg:col-span-2 h-[60vh]">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
+                {/* NOTE: sm: means in laptops and normal means in mobiles */}
+                More posts by {post?.author?.name}
+              </h2>
+              <div className="h-[59vh] overflow-y-scroll overflow-x-hidden p-4 bg-slate-200 rounded-xl">
+                {post?.otherPostsByThisPostAuthor?.map((indvPost) => {
+                  return (
+                    <div className="bg-white my-2 rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-150 cursor-default ">
                       <img
-                        src={post?.author?.avatarUrl}
-                        alt={post?.author?.name}
-                        className="w-6 rounded-full mr-2"
+                        src={indvPost?.posterUrl}
+                        alt={indvPost?.title}
+                        className="w-full h-24 object-cover"
                       />
-                      <span>{post?.author?.name}</span>
-                      <span className="mx-2">•</span>
-                      <span>{formatDateTime(indvPost?.createdAt)}</span>
-                      <span className="mx-2">•</span>
-                      <span>{indvPost?.minutesRead}min read</span>
-                    </div>
-                    <div className="flex items-center text-rose-500 text-sm mb-3">
-                      {/* <span>
+                      <div className="p-4">
+                        <h2 className="text-lg font-semibold mb-2">
+                          {post?.title}
+                        </h2>
+                        <div className="flex items-center text-gray-600 text-xs mb-2">
+                          <img
+                            src={post?.author?.avatarUrl}
+                            alt={post?.author?.name}
+                            className="w-6 rounded-full mr-2"
+                          />
+                          <span>{post?.author?.name}</span>
+                          <span className="mx-2">•</span>
+                          <span>{formatDateTime(indvPost?.createdAt)}</span>
+                          <span className="mx-2">•</span>
+                          <span>{indvPost?.minutesRead}min read</span>
+                        </div>
+                        <div className="flex items-center text-rose-500 text-sm mb-3">
+                          {/* <span>
                     {post?.likesCount > 0 ? (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -402,34 +440,36 @@ const BlogDetail = () => {
                     )}{" "}
                   </span> */}
 
-                      {/* <span>
+                          {/* <span>
                     {" "}
-                    {post.likesCount > 1
+                    {post?.likesCount > 1
                       ? ` ${post?.likesCount} appreciations`
                       : ` ${post?.likesCount} appreciation`}{" "}
                   </span> */}
+                        </div>
+                        <p className="text-gray-600 mb-4 line-clamp-3">
+                          {indvPost?.description}
+                        </p>
+                        <button
+                          className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCardClick(indvPost?._id);
+                          }}
+                        >
+                          Read More →
+                        </button>
+                      </div>
                     </div>
-                    <p className="text-gray-600 mb-4 line-clamp-3">
-                      {indvPost.description}
-                    </p>
-                    <button
-                      className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCardClick(indvPost._id);
-                      }}
-                    >
-                      Read More →
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-            <div className="flex flex-col items-center">
-              {/* <h2 className=" text-slate-700 text-sm font-semibold">
+                  );
+                })}
+                <div className="flex flex-col items-center">
+                  {/* <h2 className=" text-slate-700 text-sm font-semibold">
                 The End!
               </h2> */}
-              <Ellipsis />
+                  <Ellipsis />
+                </div>
+              </div>
             </div>
           </div>
         </div>
