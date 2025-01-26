@@ -505,6 +505,12 @@ const getAllPosts = async (req, res) => {
           likesCount: { $size: "$likes" }, // Add a new field 'likesCount' with the size of the likes array
         },
       },
+      // Step 2: Sort posts by likesCount in descending order
+      {
+        $sort: {
+          likesCount: -1, // Sort by likesCount in descending order (-1 for descending, 1 for ascending)
+        },
+      },
       {
         $project: {
           _id: 1,
