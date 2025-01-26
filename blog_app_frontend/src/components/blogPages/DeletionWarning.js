@@ -7,17 +7,20 @@ import {
   Sparkles,
   Ellipsis,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 const DeletionModal = ({
   isOpen,
   onClose,
   postName,
   likesCount,
   commentLength,
+  postId
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [text, setText] = useState("");
-  const [processDelete, setProcessDelete] = useState(false);
+  // const [processDelete, setProcessDelete] = useState(false);
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen) {
@@ -27,14 +30,42 @@ const DeletionModal = ({
     }
   }, [isOpen]);
 
-  const matchTypedString = (text) => {
+  const matchTypedString = async (text) => {
     if (text === postName) {
-      setProcessDelete(true);
+      try{
+        const response = await fetch(
+          "http://localhost:4800/api/v1/post/deletePost",
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include", // Required for cookies in cross-origin requests
+            body: JSON.stringify({
+              "postId" : postId
+            }),
+          }
+        );
+        if(response.ok){
+          showNotification("success", "Post Successfully Deleted");
+          navigate("/my-posts")
+        } 
+      }
+      catch(error){
+        showNotification("failed", "failed to delete Post , Please Retry");
+        setText("");
+      }
+
+
     } else {
       // alert("Typed string didn't matched");
       showNotification("failed", "Typed string didn't matched");
     }
   };
+
+
+
+
   useEffect(() => {
     if (!isOpen) {
       setText(""); 
