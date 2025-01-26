@@ -3,6 +3,7 @@ import { Content } from "../models/content.model.js";
 import { Post } from "../models/post.model.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Appreciation } from "../models/appreciation.model.js";
+import { Comment } from "../models/comment.model.js"
 import uploadOntoCloudinary from "../utils/cloudinary.config.js";
 
 /*
@@ -57,7 +58,7 @@ Ofcourse it will be stringified, but I can simply do  JSON.parse() on it to retu
     const slicedResponse = response
       .trim()
       .replace(/^```|```$/g, "") // Removes surrounding backticks
-      .replace(/^json\s*/, ""); // Remove "json" at the start of the response if it exists 
+      .replace(/^json\s*/, ""); // Remove "json" at the start of the response if it exists
 
     console.log("\n Type of the slicedResponse: ", typeof slicedResponse), "\n";
     console.log("\n slicedResponse: ", slicedResponse), "\n";
@@ -126,8 +127,7 @@ const createPost = async (req, res) => {
     // Step 2: Save the content in the Content model
     // console.log("content: ", content);
     // console.log("content type: ", typeof content);
-    
-    
+
     const newContent = new Content({ postContent: content }); // Assuming `text` is the content field
     const savedContent = await newContent.save();
     const contentId = savedContent._id; // Get the generated content ID
@@ -537,4 +537,126 @@ const getAllPosts = async (req, res) => {
   }
 };
 
-export { createPost, getPost, getUserPosts, getAllPosts };
+const deletePost = async (req, res) => {
+  const userIdWhoWantsToDeleteThePost = req.user._id.toString();
+  const postIdWhichIsToBeDeleted = req.body.postId;
+
+  // console.log("userIdWhoWantsToDeleteThePost: ", userIdWhoWantsToDeleteThePost.toString());
+  // console.log("postIdWhichIsToBeDeleted: ", postIdWhichIsToBeDeleted);
+
+  if (!userIdWhoWantsToDeleteThePost || !postIdWhichIsToBeDeleted) {
+    return res
+      .status(400)
+      .json({ error: "Missing data in order to delete the post." });
+  }
+
+  try {
+    const requestedPostToBeDeletedInDB = await Post.findById(
+      postIdWhichIsToBeDeleted
+    );
+
+    if (!requestedPostToBeDeletedInDB) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    if (
+      requestedPostToBeDeletedInDB.author.toString() !==
+      userIdWhoWantsToDeleteThePost
+    ) {
+      return res.status(403).json({
+        error:
+          "Unauthorised access: User not authorised to delete the requested post.",
+      });
+    }
+
+    const postDeletion = await Post.findByIdAndDelete(postIdWhichIsToBeDeleted);
+    
+    // Deleting the other post related docs: content, likes and comments, after confirming that the post has been deleted.
+    // if (!postDeletion) {
+    //   return res
+    //   .status(404)
+    //   .json({ error: "Post deletion unsuccessful. Post not found or, is already deleted." });
+    // }
+    // else {
+    //   await Content.findByIdAndDelete(requestedPostToBeDeletedInDB.content.toString());
+    //   await Comment.deleteMany({ postId: postIdWhichIsToBeDeleted });
+    //   await Appreciation.deleteMany({ postId: postIdWhichIsToBeDeleted });
+    //   return res
+    //   .status(200)
+    //   .json({ message: "Post and related metadata(content, likes and comments) deleted successfully." });
+    // }
+
+    // More improved version of this logic:-
+
+    if (!postDeletion) {
+      return res
+        .status(404)
+        .json({
+          error:
+            "Post deletion unsuccessful. Post not found or is already deleted.",
+        });
+    }
+
+    // Proceed with deleting related data
+    let contentDeleted = true;
+    let commentsDeleted = true;
+    let appreciationsDeleted = true;
+
+    try {
+      await Content.findByIdAndDelete(
+        requestedPostToBeDeletedInDB.content.toString()
+      );
+    } catch {
+      contentDeleted = false;
+    }
+
+    try {
+      await Comment.deleteMany({ postId: postIdWhichIsToBeDeleted });
+    } catch {
+      commentsDeleted = false;
+    }
+
+    try {
+      await Appreciation.deleteMany({ postId: postIdWhichIsToBeDeleted });
+    } catch {
+      appreciationsDeleted = false;
+    }
+
+    // Respond with detailed results
+    const response = {
+      message: "Post deleted successfully.",
+      contentDeleted: contentDeleted,
+      commentsDeleted: commentsDeleted,
+      appreciationsDeleted: appreciationsDeleted,
+    };
+
+    return res.status(200).json(response);
+
+    
+    // const contentDeletion = await Content.findByIdAndDelete(requestedPostToBeDeletedInDB.content.toString());
+    
+    // if (postDeletion && contentDeletion) {
+    //   return res.status(200).json({ message: "Post and Content deleted successfully." });
+    // }
+    // else if (postDeletion && !contentDeletion) {
+    //   return res
+    //     .status(404)
+    //     .json({ error: "Post deleted successfully. But content not found or is already deleted." });
+    // }
+    // else if (!postDeletion && contentDeletion) {
+    //   return res.status(404).json({
+    //     error:
+    //       "Content deleted successfully. But Post not found or is already deleted.",
+    //   });
+    // }
+    // else {
+    //   return res
+    //     .status(404)
+    //     .json({ error: "Post & Content, both not found or already deleted." });
+    // }
+  } catch (error) {
+    return res.status(500).json({ error: "Error deleting the post!" });
+  }
+};
+
+export { createPost, getPost, getUserPosts, getAllPosts, deletePost };
