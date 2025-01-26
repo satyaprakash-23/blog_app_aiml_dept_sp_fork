@@ -49,6 +49,7 @@ const DeletionModal = ({
         if(response.ok){
           showNotification("success", "Post Successfully Deleted");
           navigate("/my-posts")
+          document.body.classList.remove("overflow-hidden");
         } 
       }
       catch(error){
@@ -62,8 +63,6 @@ const DeletionModal = ({
       showNotification("failed", "Typed string didn't matched");
     }
   };
-
-
 
 
   useEffect(() => {
@@ -107,7 +106,7 @@ const DeletionModal = ({
           </button>
         </div>
         {/* post details */}
-        <div className="flex flex-col items-center justify-center text-center h-full">
+        <div className="flex flex-col items-center justify-center text-center h-full mt-4">
           <h2 className="text-lg font-semibold mb-2">{postName}</h2>
           <div className="flex items-center space-x-4 text-lg">
             <svg
