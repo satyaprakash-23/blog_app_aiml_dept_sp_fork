@@ -18,6 +18,8 @@ import AddComment from "../utils/AddComment";
 import { useNotification } from "../utils/NotificationProvider";
 import Loader from "../GlobalLoader";
 import DeletionModal from "./DeletionWarning";
+
+
 // import { motion, AnimatePresence } from "framer-motion";
 
 const BlogDetail = () => {
@@ -140,9 +142,23 @@ const BlogDetail = () => {
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
   };
+
+  // const handleEdit = () => {
+  //   console.log("Edit clicked");
+  //   navigate(`/edit-post/${post?._id}`);
+  // };
+
   const handleEdit = () => {
     console.log("Edit clicked");
+    navigate(`/edit-post/${post?._id}`, {
+      state: {
+        prevContent:  post?.content,
+        prevTitle: post?.title,
+        prevDescription: post?.description,
+      },
+    });
   };
+
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const handleOpenDeletionModal = () => setIsDeletionModalOpen(true);
   const handleCloseDeletionModal = () => setIsDeletionModalOpen(false);
@@ -183,11 +199,13 @@ const BlogDetail = () => {
           onClose={handleCloseDeletionModal}
           authorName={post?.author?.name}
           postName={post?.title}
-          likesCount = {post?.likesCount}
-          commentLength = {post?.comments?.length}
-          postId = {post?._id}
+          likesCount={post?.likesCount}
+          commentLength={post?.comments?.length}
+          postId={post?._id}
         />
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 `}>
+        <div
+          className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 `}
+        >
           {/* Header */}
           <div className="flex justify-between items-center mb-4 sm:mb-6 lg:mb-8">
             <button
@@ -228,7 +246,7 @@ const BlogDetail = () => {
                       {/* Edit Option */}
                       <li
                         className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
-                        onClick={handleEdit}
+                        onClick={() => handleEdit()}
                       >
                         Edit
                       </li>

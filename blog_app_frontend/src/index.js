@@ -18,6 +18,7 @@ import NotificationProvider from "./components/utils/NotificationProvider.js";
 import About from "./components/About/About.js";
 import Footer from "./components/About/Footer.js";
 import SignUpPage from "./components/SignUpPage.js";
+import EditPost from "./components/EditPost/EditPost.js";
 
 const Layout = () => {
   const dispatch = useDispatch();
@@ -78,6 +79,7 @@ root.render(
             <Route path="my-posts" element={<MyPosts />} />
             <Route path="add-post" element={<AddPost />} />
             <Route path="about" element={<About />} />
+            <Route path="edit-post/:id" element={<EditPost />} />
           </Route>
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />

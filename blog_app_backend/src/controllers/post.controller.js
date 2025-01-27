@@ -665,4 +665,92 @@ const deletePost = async (req, res) => {
   }
 };
 
-export { createPost, getPost, getUserPosts, getAllPosts, deletePost };
+const editPost = async (req, res) => {
+  try {
+    const { postId } = req.params; // Get the post ID from the request params
+    const { title, description, content } = req.body;
+
+    // Step 1: Validate input
+    if (
+      [title, description, content].every(
+        (field) => field?.trim() === "" || field === null || field === undefined
+      )
+    ) {
+      return res.status(400).json({
+        error: "At least one field must be provided to update the post!",
+      });
+    }
+
+    // Step 2: Fetch the post to be updated
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found!" });
+    }
+
+    // Ensure the user is authorized to edit the post
+    if (String(post.author) !== String(req.user._id)) {
+      return res.status(403).json({ error: "Unauthorized action!" });
+    }
+
+    // Step 3: Update the content if provided
+    if (content) {
+      const existingContent = await Content.findById(post.content);
+
+      if (!existingContent) {
+        return res.status(404).json({ error: "Content not found!" });
+      }
+
+      existingContent.postContent = content;
+      await existingContent.save();
+    }
+
+    // Step 4: Handle poster update if a new file is provided
+    const posterUrlLocalPath = req.file?.path;
+    let posterUrl = post.posterUrl;
+
+    if (posterUrlLocalPath) {
+      const uploadedPoster = await uploadOntoCloudinary(posterUrlLocalPath);
+
+      if (!uploadedPoster) {
+        return res
+          .status(400)
+          .json({ error: "Error while uploading poster to Cloudinary." });
+      }
+
+      posterUrl = uploadedPoster.url;
+      post.posterUrl = posterUrl;
+    }
+
+    // Step 5: Update the post fields
+    // Update title if present
+    if (title) {
+      post.title = title;
+    }
+
+    // Update description if present
+    if (description) {
+      post.description = description;
+    }
+
+    post.updatedAt = new Date();
+
+    // Save the updated post
+    await post.save();
+
+    // Step 6: Respond to the client
+    res.status(200).json({
+      message: "Post updated successfully",
+      post,
+    });
+  } catch (error) {
+    console.error("Error editing post:", error);
+    res.status(500).json({
+      message: "Failed to edit post",
+      error: error.message,
+    });
+  }
+};
+
+
+export { createPost, getPost, getUserPosts, getAllPosts, deletePost, editPost };

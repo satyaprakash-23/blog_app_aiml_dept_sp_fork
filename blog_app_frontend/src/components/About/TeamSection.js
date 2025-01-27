@@ -1,6 +1,6 @@
 import React from "react";
 import { Code, Palette } from "lucide-react";
-import profile from "../../assets/profile-pic.jpg";
+import profile from "../../assets/SatyaPrakash_ProfilePic.jpeg";
 
 const teamData = [
   {
@@ -15,7 +15,7 @@ const teamData = [
     name: "Kumar Harsh",
     role: "Backend Developer",
     description:
-      "Backend developer responsible for the blog's architecture and functionality",
+      "Strategist & Analyst behind blog's architecture and functionality",
     image:
       "https://media.licdn.com/dms/image/v2/D5603AQEGrc1YYqI_yg/profile-displayphoto-shrink_400_400/B56ZRoNAq2HwAk-/0/1736915029517?e=1743033600&v=beta&t=_s6yXUtjRq0LjQ8AiepJBxnLYM3MT3ydE63SUTUy2BU",
     icon: Code,
@@ -36,7 +36,7 @@ const TeamSection = () => {
                 <img
                   src={member.image}
                   alt={member.name}
-                  className="w-24 h-24 rounded-full object-cover"
+                  className="w-24 h-24 rounded-lg object-cover"
                 />
                 <div>
                   <h3 className="text-xl font-semibold">{member.name}</h3>
