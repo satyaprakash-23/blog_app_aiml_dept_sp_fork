@@ -98,9 +98,13 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-6 cursor-default">
             <img src={maitLogo} className="w-16 "></img>
-            <div className="flex ">
+            <div className="flex items-center">
               <BookOpen className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold">BlogSpace</span>
+              <div className=" ml-2 flex flex-col items-center text-base font-bold">
+                <p className="relative top-1">AI & ML</p>
+                <p className="relative bottom-1">BlogSpace</p>
+              </div>
+              {/* <span className="ml-2 text-xl font-bold">BlogSpace</span> */}
             </div>
           </div>
 

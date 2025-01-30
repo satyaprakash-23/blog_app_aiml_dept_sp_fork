@@ -46,7 +46,7 @@ const Home = () => {
       setCurrentSlide((prev) => (prev + 1) % 3);
       // console.log("Current Slide (index): ",currentSlide);
       // console.log("3) slides length in useEffect: ", slides.length);
-    }, 6000);
+    }, 3000);
 
     return () => clearInterval(timer);
   }, []);
