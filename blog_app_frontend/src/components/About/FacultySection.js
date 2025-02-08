@@ -12,7 +12,7 @@ const facultyData = [
     image: "https://cse.mait.ac.in/images/Tripti_Lamba.jpg", // Replace with faculty image URL
   },
   {
-    name: "Ms. Gunjan Chugh",
+    name: "Dr. Gunjan Chugh",
     title: "Assistant Professor- AI &ML Department  ",
     image: "https://cse.mait.ac.in/images/Gunjan_Chugh.jpg", // Replace with faculty image URL
   },

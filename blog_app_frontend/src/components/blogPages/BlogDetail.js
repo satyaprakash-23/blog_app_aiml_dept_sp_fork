@@ -152,9 +152,11 @@ const BlogDetail = () => {
     console.log("Edit clicked");
     navigate(`/edit-post/${post?._id}`, {
       state: {
-        prevContent:  post?.content,
+        postId: post?._id,
+        prevContent: post?.content,
         prevTitle: post?.title,
         prevDescription: post?.description,
+        prevPosterUrl: post?.posterUrl,
       },
     });
   };

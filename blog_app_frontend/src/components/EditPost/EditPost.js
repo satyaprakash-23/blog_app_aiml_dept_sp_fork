@@ -9,37 +9,17 @@ import parse from "html-react-parser";
 
 // { prevContent, prevTitle, prevDescription }
 const EditPost = () => {
-
   const location = useLocation();
-  const { prevContent, prevTitle, prevDescription } = location.state || {}; // Destructure the passed state
+  const { postId, prevContent, prevTitle, prevDescription, prevPosterUrl } = location.state || {}; // Destructure the passed state
 
   // console.log("Previous Content:", prevContent);
-  console.log("Previous Title:", prevTitle);
-  console.log("Previous Description:", prevDescription);
+  // console.log("Previous Title:", prevTitle);
+  // console.log("Previous Description:", prevDescription);
 
-  function decodeHTMLFromJSON(escapedText) {
-      return escapedText
-        .replace(/\\u003C/g, "<") // Decode < from \u003C
-        .replace(/\\u003E/g, ">") // Decode > from \u003E
-        .replace(/\\u0026/g, "&") // Decode & from \u0026
-        .replace(/\\u0022/g, '"') // Decode " from \u0022
-        .replace(/\\"/g, '"') // Decode escaped double quotes
-        .replace(/\\'/g, "'") // Decode escaped single quotes
-        .replace(/\\\\/g, "\\") // Decode backslashes
-        .replace(/\\n/g, "");
-        // .replace(/\\n/g, "<br>"); // Decode newline characters
-      // Pehle ye aaise de rha tha:- .replace(/\\n/g, "\n");  -> I changed it to "<br>"!!
-    }
+  // const parsedPrevContent = parse(prevContent);
+  // console.log("Previous Content, parsed:", parsedPrevContent);
 
-    const RenderHTML = ({ htmlContent }) => {
-      return <div dangerouslySetInnerHTML={{ __html: htmlContent }}></div>;
-    };
-
-
-  const parsedPrevContent = parse((prevContent));
-  console.log("Previous parsed Content:", parsedPrevContent);
-
-  const [content, setContent] = useState(parsedPrevContent);
+  const [content, setContent] = useState(prevContent);
   const [title, setTitle] = useState(prevTitle);
   const [description, setDescription] = useState(prevDescription);
   const [image, setImage] = useState(null);
@@ -47,6 +27,13 @@ const EditPost = () => {
   const [isPublishing, setIsPublishing] = useState(false);
 
   const { showNotification } = useNotification();
+
+  const [checked, setChecked] = useState({
+    description: false,
+    title: false,
+    content: false,
+    image: false,
+  });
 
   const navigate = useNavigate();
 
@@ -58,72 +45,102 @@ const EditPost = () => {
 
   const publishBlog = async (e) => {
     e.preventDefault();
-    setIsPublishing(true);
+    // setIsPublishing(true);
     console.log("Dummy Updating blog");
-    setTimeout(() => {
-      setIsPublishing(false);
-    }, 2000);
-
-    // if (
-    //   [content, title, description, image].some(
-    //     (field) => field === "" || field === null || field === undefined
-    //   )
-    // ) {
+    // setTimeout(() => {
     //   setIsPublishing(false);
-    //   showNotification("error", "All fields are required!");
-    //   return;
-    // }
-
-    //   if (!image) {
-    //     setIsLoading(false);
-    //     showNotification("error", "Please select an image!");
-    //     return;
-    //   }
-
-    // setIsLoading(true);
+    // }, 2000);
 
     // Create FormData instance
-    // const formData = new FormData();
-    // formData.append("title", title);
-    // formData.append("content", JSON.stringify(content));
-    // formData.append("description", description);
-    // formData.append("poster", image); // Append the file
+    const formData = new FormData();
 
-    // try {
-    //   const response = await fetch(
-    //     "http://localhost:4800/api/v1/post/createPost",
-    //     {
-    //       method: "POST",
-    //       credentials: "include",
-    //       body: formData, // Send FormData directly
-    //     }
-    //   );
+    if (checked.title) {
+      if (
+        (title === "" || title === null || title === undefined)
+      ) {
+        console.log("You selected title, but its empty!");
+        showNotification("error", "You choose title but its empty!");
+      } else {
+        console.log("Title appended!", title);
+        formData.append("title", title);
+      }
+    } 
 
-    //   console.log("response: ", response);
+    if (checked.content) {
+      if (content === "" || content === null || content === undefined) {
+        console.log("You selected content, but its empty!");
+        showNotification("error", "You choose content but its empty!");
+      } else {
+        console.log("Content appended!", content);
+        formData.append("content", content);
+      }
+    } 
 
-    //   const result = await response.json();
+    if (checked.description) {
+      if (description === "" || description === null || description === undefined) {
+        console.log("You selected description, but its empty!");
+        showNotification("error", "You choose description but its empty!");
+      } else {
+        console.log("Description appended!", description);
+        formData.append("description", description);
+      }
+    } 
 
-    //   console.log("result: ", result);
+    if (checked.image) {
+      if (
+        image === "" ||
+        image === null ||
+        image === undefined
+      ) {
+        console.log("You selected image, but its empty!");
+        showNotification("error", "You choose image but its empty!");
+      } else {
+        console.log("Image appended!");
+        formData.append("poster", image);
+      }
+    } 
 
-    //   if (!result) {
-    //     console.log("Failed to create post.");
-    //     return;
-    //   }
+    console.log("formData entries: \n");
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }    
+    setIsPublishing(true);
 
-    //   if (result.message === "Post created successfully") {
-    //     // setContent("");
-    //     // setTitle("");
-    //     // setDescription("");
-    //     // setImage(null);
-    //     setIsPublishing(false);
-    //     showNotification("success", "Your blog is published successfully!");
-    //     navigate(`/all-posts/${result.post?._id}`);
-    //   }
-    // } catch (error) {
-    //   showNotification("error", "Failed to publish blog!");
-    //   setIsPublishing(false);
-    //   console.log("Failed to create post:", error);
-    // }
+    try {
+      const response = await fetch(
+        `http://localhost:4800/api/v1/post/editPost/${postId}`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          body: formData, // Send FormData directly
+        }
+      );
+
+      console.log("response: ", response);
+
+      const result = await response.json();
+
+      console.log("result: ", result);
+
+      if (!result) {
+        console.log("Failed to create post.");
+        return;
+      }
+
+      if (result.message === "Post updated successfully") {
+        // setContent("");
+        // setTitle("");
+        // setDescription("");
+        // setImage(null);
+        setIsPublishing(false);
+        showNotification("success", "Your blog is published successfully!");
+        navigate(`/all-posts/${postId}`);
+      }
+    } catch (error) {
+      showNotification("error", "Failed to publish blog!");
+      setIsPublishing(false);
+      console.log("Failed to create post:", error);
+    }
   };
   //   NOTE: TODO: I need to setup multer for image upload in the backend and then send the image as a formdata object.
 
@@ -151,16 +168,20 @@ const EditPost = () => {
           }
         >
           <div className="mx-2">
-            <RTE setContent={setContent} prevContent={prevContent} />
+            <RTE setContent={setContent} content={content} />
           </div>
           <div className="mx-2">
             <DescriptionTitleImageForms
               setDescription={setDescription}
               setImage={setImage}
+              image={image}
               setTitle={setTitle}
               publishBlog={publishBlog}
-              prevDescription={prevDescription}
-              prevTitle={prevTitle}
+              prevDescription={description}
+              prevTitle={title}
+              prevPosterUrl={prevPosterUrl}
+              checked={checked}
+              setChecked={setChecked}
             />
           </div>
         </div>

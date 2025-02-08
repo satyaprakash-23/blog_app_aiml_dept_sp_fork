@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import maitLogo from "../assets/mait_logo.png";
 import { useDispatch } from "react-redux";
 import { login } from "../reduxStateManagementFiles/authSlice";
+import { useNotification } from "./utils/NotificationProvider";
 
 function SignUpPage() {
   const [enrolment, setEnrolment] = useState("");
@@ -12,6 +13,8 @@ function SignUpPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [image, setImage] = useState(null);
+
+  const { showNotification } = useNotification();
 
   const navigate = useNavigate();
 
@@ -30,12 +33,17 @@ function SignUpPage() {
           field?.trim() === undefined
       )
     ) {
-      alert("Please fill all the fields! Profile picture is optional though!");
+      // alert("Please fill all the fields! Profile picture is optional though!");
+      showNotification(
+        "error",
+        "Please fill all the fields! Profile picture is optional though!"
+      );
       return;
     }
     // If the passwords do not match, alert the user
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      // alert("Passwords do not match!");
+      showNotification("error", "Passwords do not match!");
       return;
     }
 
@@ -79,9 +87,14 @@ function SignUpPage() {
             setPassword("");
             setConfirmPassword("");
             setImage(null);
+            showNotification(
+              "success",
+              "You signed up successfully! Please login now!"
+            );
             navigate("/signin");
         }
     } catch (error) {
+      showNotification("error", "Something went wrong! Please try again!");
       console.error("Error during sign up:", error);
     }
   };

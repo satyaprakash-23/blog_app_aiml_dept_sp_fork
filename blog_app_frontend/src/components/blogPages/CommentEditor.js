@@ -11,7 +11,7 @@ const CommentEditor = forwardRef(
     const [textAreaContent, settextAreaContent] = useState(null);
     // const [responseMessage, setResponseMessage] = useState(false);
     const handlePostComment = async (e) => {
-      if (textAreaContent == null) {
+      if (textAreaContent == null || textAreaContent == "") {
         showNotification("error", "Please write a comment.");
         return;
       }

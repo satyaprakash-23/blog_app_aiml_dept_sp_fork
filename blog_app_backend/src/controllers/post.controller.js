@@ -12,14 +12,18 @@ Note that the "content" will be generated through TINY-MCE rich-text editor whic
   \n Now let's talk about the response you have to give me. \n
 */
 
+// \nNote that the "content" will be generated through TINY-MCE rich-text editor which produces the content in pure HTML. But it will be given to you after doing "JSON.stringify(tinyMceProducedContent)" So the "content" will be solething like this:- 
+//   \n "<p><span style=\"color: #e03e2d;\">Hello</span> <strong>there nsdjfnojdpo jfob onf obnfonfdff</strong></p>\n<p>&nbsp;</p>\n<div>\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry." \n You can use html-react-parser to parse the content.
+//   \n Now let's talk about the response you have to give me. \n
+
 // Code for a Function to Call the GPT API
 const generatePostMetadata = async (title, description, content) => {
   // 1. Construct the User Prompt
   const userPrompt = `Blog Title: ${title}\nDescription: ${description}\nContent: ${content}\n 
-  \n Please provide response in JSON format having fields "summary" "minutesRead" and "tags". Just give me the "result" such that, the "result.response.text()" is in this form:- \n 
-  \nNote that the "content" will be generated through TINY-MCE rich-text editor which produces the content in pure HTML. But it will be given to you after doing "JSON.stringify(tinyMceProducedContent)" So the "content" will be solething like this:- 
-  \n "<p><span style=\"color: #e03e2d;\">Hello</span> <strong>there nsdjfnojdpo jfob onf obnfonfdff</strong></p>\n<p>&nbsp;</p>\n<div>\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry." \n You can use html-react-parser to parse the content.
-  \n Now let's talk about the response you have to give me. \n
+  \n Please provide response in JSON format having fields "summary" "minutesRead" and "tags". \n 
+  The content which you will be getting is in pure HTML form like this: \n
+  <p style="text-align: center;"><span style="font-size: 36pt;"><span style="color: #e03e2d;"><strong>Exploring the Depths of AI</strong></span> </span></p> \n
+  Just give me the "result" such that, the "result.response.text()" is in this form:- \n 
   {
   "summary": "Post's Summary not more than 450 letters. Don't give me the summary in parsed HTML format. Else just give it in simple text form. ",
   "minutesRead": intValue,
@@ -669,6 +673,11 @@ const editPost = async (req, res) => {
   try {
     const { postId } = req.params; // Get the post ID from the request params
     const { title, description, content } = req.body;
+
+    console.log(title);
+    console.log(description);
+    console.log(content);
+    
 
     // Step 1: Validate input
     if (

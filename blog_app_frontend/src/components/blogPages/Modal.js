@@ -39,7 +39,7 @@ const Modal = ({ isOpen, onClose, content, title }) => {
     >
       {/* Modal container */}
       <div
-        className={`bg-black text-white rounded-lg shadow-xl w-11/12 sm:w-2/3 lg:w-1/2 max-h-[80vh] overflow-hidden transform transition-all duration-700 ${
+        className={`bg-black text-white rounded-lg shadow-xl w-[90%] h-[90%] overflow-hidden transform transition-all duration-700 ${
           isVisible
             ? "scale-100 translate-y-0 opacity-100"
             : "scale-90 translate-y-10 opacity-0"
@@ -57,8 +57,8 @@ const Modal = ({ isOpen, onClose, content, title }) => {
           </button>
         </div>
         {/* Modal Content */}
-        <div className="p-6 overflow-y-auto max-h-[60vh] text-lg prose">
-          {parse(decodeHTMLFromJSON(content))}
+        <div className="p-6 overflow-y-auto max-h-[89%] text-lg prose">
+          {parse(content)}
         </div>
       </div>
     </div>

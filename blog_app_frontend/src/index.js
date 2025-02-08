@@ -54,13 +54,12 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen flex flex-col p-4 bg-gray-100">
-      <NotificationProvider>
+      
         <Navbar />
         <main className="flex-grow mt-3">
           <Outlet />
         </main>
         <Footer />
-      </NotificationProvider>
     </div>
   );
 };
@@ -69,22 +68,24 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="all-posts" element={<AllPost />} />
-            <Route path="all-posts/:id" element={<BlogDetail />} />{" "}
-            {/* Corrected path */}
-            <Route path="my-posts" element={<MyPosts />} />
-            <Route path="add-post" element={<AddPost />} />
-            <Route path="about" element={<About />} />
-            <Route path="edit-post/:id" element={<EditPost />} />
-          </Route>
-          <Route path="/signin" element={<SignInPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-        </Routes>
-      </Router>
+      <NotificationProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="all-posts" element={<AllPost />} />
+              <Route path="all-posts/:id" element={<BlogDetail />} />{" "}
+              {/* Corrected path */}
+              <Route path="my-posts" element={<MyPosts />} />
+              <Route path="add-post" element={<AddPost />} />
+              <Route path="about" element={<About />} />
+              <Route path="edit-post/:id" element={<EditPost />} />
+            </Route>
+            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+          </Routes>
+        </Router>
+      </NotificationProvider>
     </Provider>
   </React.StrictMode>
 );

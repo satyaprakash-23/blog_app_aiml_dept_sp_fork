@@ -1,56 +1,73 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import { BookOpen } from "lucide-react";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import maitLogo from "../assets/mait_logo.png";
-import {useDispatch} from "react-redux";
-import { login } from '../reduxStateManagementFiles/authSlice';
-
+import { useDispatch } from "react-redux";
+import { login } from "../reduxStateManagementFiles/authSlice";
+import { useNotification } from "./utils/NotificationProvider";
 
 function SignInPage() {
-    const dispatch = useDispatch();
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
+  const dispatch = useDispatch();
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const submitHandler = async (e) => {
-        e.preventDefault();
+  const { showNotification } = useNotification();
 
-        // console.log(email);
-        // console.log(password);
+  const submitHandler = async (e) => {
+    e.preventDefault();
 
-        try {
-            const response = await fetch(
-              "http://localhost:4800/api/v1/user/signin",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                credentials: "include", // Required for cookies in cross-origin requests
-                body: JSON.stringify({
-                  email,
-                  password,
-                }),
-              }
-            ); 
+    // console.log(email);
+    // console.log(password);
 
-            if (!response.ok) {
-              throw new Error("Failed to sign in");
-            }
+    try {
+      const response = await fetch("http://localhost:4800/api/v1/user/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Required for cookies in cross-origin requests
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-            const jsonResponse = await response.json();
-            if (jsonResponse) {
-                dispatch(login(jsonResponse.user));
-            }
-            console.log("Sign-in successful:", jsonResponse.user);
-            
-            navigate("/");
+      if (!response.ok) {
+        // response.json().then((jsonRes) => {
+        //   console.log("errorMessage: ", jsonRes.error);
+        //   showNotification("error", jsonRes.error);
+        // })
+        // return;
+        const jsonResponse = await response.json();
+        showNotification("error", jsonResponse.error);
+        return;
+        // console.log("I'm here");
+        // console.log(jsonResponse);
+        // const errorMessage = jsonResponse.error;
+        // console.log("errorMessage: ", errorMessage);
+        // throw new Error("Failed to sign in");
+      }
 
-        } catch (error) {
-            console.error("Error signing in:", error.message);
-        }
+      const jsonResponse = await response.json();
+
+      if (jsonResponse) {
+        dispatch(login(jsonResponse.user));
+      }
+
+      console.log("Sign-in successful:", jsonResponse.user);
+      showNotification(
+        "success",
+        `Hello! Welcome back ${jsonResponse?.user?.name}!`
+      );
+      navigate("/");
+    } catch (error) {
+      // showNotification("error", error.message);
+      showNotification("error", "Something went wrong! Please try again!");
+      console.error("Error signing in:", error);
     }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen ">
@@ -116,7 +133,7 @@ function SignInPage() {
               Sign In
             </button>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Don&apos;t want to sign in? &nbsp; 
+              Don&apos;t want to sign in? &nbsp;
               <Link
                 to="/"
                 className="font-medium text-blue-600 hover:underline"
@@ -131,4 +148,4 @@ function SignInPage() {
   );
 }
 
-export default SignInPage
+export default SignInPage;

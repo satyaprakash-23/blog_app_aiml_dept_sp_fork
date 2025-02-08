@@ -28,18 +28,16 @@ const AddPost = () => {
     e.preventDefault();
     setIsPublishing(true);
     console.log(JSON.stringify(content));
+    console.log(content);
 
     if (
       [content, title, description, image].some(
-        (field) =>
-          field === "" ||
-          field === null ||
-          field === undefined
+        (field) => field === "" || field === null || field === undefined
       )
     ) {
-        setIsPublishing(false);
-        showNotification("error", "All fields are required!");
-        return;
+      setIsPublishing(false);
+      showNotification("error", "All fields are required!");
+      return;
     }
 
     //   if (!image) {
@@ -53,7 +51,7 @@ const AddPost = () => {
     // Create FormData instance
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("content", JSON.stringify(content));
+    formData.append("content", content); // Now we're not stringifying! Means: JSON.stringify(content)
     formData.append("description", description);
     formData.append("poster", image); // Append the file
 
@@ -68,7 +66,6 @@ const AddPost = () => {
       );
 
       console.log("response: ", response);
-      
 
       const result = await response.json();
 
@@ -94,7 +91,6 @@ const AddPost = () => {
         console.log("Failed to create post:", error);
     }
   }
-//   NOTE: TODO: I need to setup multer for image upload in the backend and then send the image as a formdata object.
 
   if (isPublishing) {
     return (
