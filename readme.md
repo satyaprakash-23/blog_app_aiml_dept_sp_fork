@@ -1,3 +1,6 @@
+#Deployed Link
+https://mait-aimldept-blogapp.live/
+
 Steps to set up this app on your PC:-
 
 S1) First of all make a fork of this repo for yourself. This means, do not start direct contributions.
